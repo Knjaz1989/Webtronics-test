@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/login.css') }}">
+</head>
+<body>
+    <div class="login__box">
+        <header class="login__title">authorization</header>
+        <form action="/login" method="post">
+            <label>
+                <span class="input__title">login</span>
+                <input class="input__field" type="text" name="login">
+            </label>
+            <label>
+                <span class="input__title">password</span>
+                <input class="input__field" type="password" name="password">
+            </label>
+        </form>
+    </div>
+</body>
+</html>

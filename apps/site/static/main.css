@@ -1,0 +1,28 @@
+.header {
+    height: 100px;
+    background-color: cornflowerblue;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.header__menu {
+    margin-right: 50px;
+}
+
+.menu__item {
+    color: white;
+    text-decoration: none;
+    text-transform: uppercase;
+    margin-right: 20px;
+}
+
+.menu__item:last-child {
+    margin-right: 0;
+}
+
+.menu__item:hover {
+    text-decoration: underline;
+    color: antiquewhite;
+}
