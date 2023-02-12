@@ -4,11 +4,23 @@ from typing import Optional
 from pydantic import BaseModel, validator, EmailStr, UUID4, Field
 
 
-class UserCreate(BaseModel):
-    """Sign up request schema."""
-    name: str
-    password: str
+class UserLogin(BaseModel):
+    """Log in request schema."""
     email: EmailStr
+    password: str
+
+    @validator('email')
+    def lowerlify_email(cls, value):
+        """To lowercase"""
+        return value.lower()
+
+
+class UserCreate(UserLogin):
+    """
+    Sign up request schema.
+    Email and password inherit from parent
+    """
+    name: str
 
 
 class TokenResponse(BaseModel):
@@ -24,8 +36,3 @@ class TokenResponse(BaseModel):
     def hexlify_token(cls, value):
         """UUID to hex string converter."""
         return value.hex
-
-
-class Post(BaseModel):
-    title: str
-    text: str

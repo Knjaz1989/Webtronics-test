@@ -1,7 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import declarative_base, validates
-
-from apps.site.utils.helpers import check_email
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
