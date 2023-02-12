@@ -1,18 +1,26 @@
 import os
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
+from pydantic import BaseSettings
 
 
-load_dotenv()
+# load_dotenv()
 
 
-class Config:
-    user = os.getenv('DB_USER')
-    password = os.getenv('DB_PASSWORD')
-    base = os.getenv('DB_BASE')
-    host = os.getenv('DB_HOST')
-    port = os.getenv('DB_PORT')
-    sqlalchemy_url = f"postgresql://{user}:{password}@{host}:{port}/{base}"
+class Config(BaseSettings):
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_BASE: str
+    DB_HOST: str
+    DB_PORT: str
+    SQLALCHEMY_URL: str
+    ASYNC_SQLALCHEMY_URL: str
+
+    SECRET = 'SECRET'
+
+    class Config:
+        env_file = '.env'
 
 
 config = Config()
+a = 1
