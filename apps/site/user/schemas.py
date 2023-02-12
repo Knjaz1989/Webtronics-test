@@ -5,12 +5,14 @@ from pydantic import BaseModel, validator, EmailStr, UUID4, Field
 
 
 class UserCreate(BaseModel):
+    """Sign up request schema."""
     name: str
     password: str
     email: EmailStr
 
 
-class TokenBase(BaseModel):
+class TokenResponse(BaseModel):
+    """Response schema with token details."""
     token: UUID4 = Field(..., alias='access_token')
     expires: datetime
     token_type: Optional[str] = 'bearer'
