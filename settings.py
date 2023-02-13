@@ -1,10 +1,4 @@
-import os
-
-# from dotenv import load_dotenv
 from pydantic import BaseSettings
-
-
-# load_dotenv()
 
 
 class Config(BaseSettings):
@@ -18,9 +12,11 @@ class Config(BaseSettings):
 
     SECRET = 'SECRET'
 
+    TOKEN_EXPIRE_MINUTES: int = 60
+    ALGORITHM: str = 'HS256'
+
     class Config:
         env_file = '.env'
 
 
 config = Config()
-a = 1

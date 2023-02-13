@@ -1,10 +1,12 @@
 import hashlib
 from datetime import datetime, timedelta
-from sqlalchemy import and_
 
-from apps.site.schemas.users import UserCreate
+from fastapi import HTTPException, status
+from jose import jwt, JWTError
+
+from .schemas import UserCreate
 from database.db_connection import db
-from database.models import User, Token
+from settings import config
 
 
 def hash_password(password: str) -> str:
@@ -18,14 +20,29 @@ def validate_password(password: str, hashed_password: str):
     return hash_password(password) == hashed_password
 
 
-async def create_user_token(user_id: int):
-    """Create token for user with user_id."""
-    query = (
-        Token.insert()
-        .values(expires=datetime.now() + timedelta(weeks=2), user_id=user_id)
-        .returning(Token.token, Token.expires)
+def create_token(data: dict) -> tuple:
+    """Create token for user"""
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(
+        minutes=to_encode.get("expire_minutes")
     )
-    return await db.fetch_one(query)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(
+        to_encode, config.SECRET, algorithm=config.ALGORITHM
+    )
+    return encoded_jwt, expire
+
+
+def decode_token(token: str) -> dict | str:
+    try:
+        data = jwt.decode(token, config.SECRET, algorithms=[config.ALGORITHM])
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Wrong token or it has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return data
 
 
 async def create_user(user: UserCreate):
@@ -51,15 +68,5 @@ async def get_user_by_email(email: str):
         SELECT * FROM users
         WHERE email = :email
         """
-    return await db.fetch_one(query, {'email': email})
-
-
-async def get_user_by_token(token: str):
-    """Return user info by token."""
-    query = Token.join(User).select().where(
-        and_(
-            Token.token == token,
-            Token.expires > datetime.now()
-        )
-    )
-    return await db.fetch_one(query)
+    user = await db.fetch_one(query, {'email': email})
+    return dict(user._mapping)

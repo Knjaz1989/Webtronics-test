@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 
-from apps.site.user.route import user_router
+from .user.routes import user_router
+from .post.routes import post_router
 from database.db_connection import db
 
 
 app = FastAPI()
 app.include_router(user_router)
+app.include_router(post_router)
 
 # app.mount(
 #     "/static",
