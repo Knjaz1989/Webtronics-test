@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from .user.routes import user_router
-from .post.routes import post_router
+from apps.site.routes.user_routes import user_router
+from apps.site.routes.post_routes import post_router
 from database.db_connection import db
 
 

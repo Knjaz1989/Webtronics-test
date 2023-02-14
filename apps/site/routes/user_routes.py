@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from .schemas import TokenResponse
-from .views import sign_up, login
+from apps.site.schemas.user_schemas import TokenResponse
+from apps.site.views.user_views import sign_up, login
 
-user_router = APIRouter()
+user_router = APIRouter(prefix="/user", tags=["user"])
 
 
 user_router.add_api_route("/sign_up", endpoint=sign_up, methods=['POST'])
