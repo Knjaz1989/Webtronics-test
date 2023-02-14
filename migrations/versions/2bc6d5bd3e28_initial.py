@@ -32,8 +32,8 @@ def upgrade() -> None:
     sa.Column('title', sa.VARCHAR(length=150), nullable=True),
     sa.Column('text', sa.TEXT(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('likes', sa.Integer(), nullable=True),
-    sa.Column('dislikes', sa.Integer(), nullable=True),
+    sa.Column('likes', sa.Integer(), nullable=True, server_default=sa.text('0')),
+    sa.Column('dislikes', sa.Integer(), nullable=True, server_default=sa.text('0')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )

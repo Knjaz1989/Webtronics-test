@@ -40,8 +40,8 @@ class Post(Base):
     title = sa.Column(sa.VARCHAR(150))
     text = sa.Column(sa.TEXT)
     user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete='CASCADE'))
-    likes = sa.Column(sa.Integer, default=0)
-    dislikes = sa.Column(sa.Integer, default=0)
+    likes = sa.Column(sa.Integer, server_default=sa.text('0'))
+    dislikes = sa.Column(sa.Integer, server_default=sa.text('0'))
 
     def __str__(self):
         return f'{self.login}: {self.email}'

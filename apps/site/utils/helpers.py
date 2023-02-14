@@ -67,6 +67,8 @@ async def get_user_by_email(email: str):
         WHERE email = :email
         """
     user = await db.fetch_one(query, {'email': email})
+    if not user:
+        return None
     return dict(user._mapping)
 
 
