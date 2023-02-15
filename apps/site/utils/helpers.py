@@ -105,3 +105,20 @@ async def delete_post(user_id: int, post_id: int):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You don't have such post",
         )
+
+
+async def change_post(user_id, post_data: dict) -> None:
+    set_list = []
+    for field, value in post_data.copy().items():
+        if value and field != 'id':
+            set_list.append(f'{field} = :{field}')
+        elif not value:
+            del post_data[field]
+    post_data.update({'user_id': user_id})
+    query = f"""
+        UPDATE posts
+        SET {', '.join(set_list)}
+        WHERE user_id = :user_id AND id = :id;
+        """
+    await db.execute(query=query, values=post_data)
+
