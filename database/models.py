@@ -24,15 +24,6 @@ class User(Base):
         return f'{self.login}: {self.email}'
 
 
-class Token(Base):
-    __tablename__ = 'tokens'
-
-    id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
-    token = sa.Column(sa.String)
-    expires = sa.Column(sa.DateTime)
-    user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete='CASCADE'))
-
-
 class Post(Base):
     __tablename__ = 'posts'
 
