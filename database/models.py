@@ -39,3 +39,26 @@ class Post(Base):
 
     def __repr__(self):
         return f'{self.login}: {self.email}'
+
+
+class Rates(Base):
+    __tablename__ = 'rates'
+
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(User.id, ondelete='CASCADE'),
+        primary_key=True
+    )
+    post_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(Post.id, ondelete='CASCADE'),
+        primary_key=True
+    )
+    like = sa.Column(sa.Boolean, server_default=sa.sql.text('false'))
+    dislike = sa.Column(sa.Boolean, server_default=sa.text('false'))
+
+    def __str__(self):
+        return f'user: {self.user_id} - post: {self.post_id}'
+
+    def __repr__(self):
+        return f'user: {self.user_id} - post: {self.post_id}'
