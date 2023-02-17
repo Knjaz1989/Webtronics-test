@@ -1,4 +1,10 @@
+from enum import Enum
 from pydantic import BaseModel, Field, root_validator
+
+
+class EnumAction(Enum):
+    like = 'like'
+    dislike = 'dislike'
 
 
 class PostAdd(BaseModel):
@@ -8,6 +14,11 @@ class PostAdd(BaseModel):
 
 class PostBase(BaseModel):
     id: int = Field(..., ge=1, alias="post_id")
+
+
+class PostRate(PostBase):
+    """Inherit 'id' field from parent"""
+    action: EnumAction
 
 
 class PostUpdate(PostBase):
@@ -21,7 +32,3 @@ class PostUpdate(PostBase):
             raise ValueError(
                 "Expected two fields or one of 'title' or 'text'")
         return values
-
-
-class PostDelete(BaseModel):
-    post_id: int = Field(..., ge=1)

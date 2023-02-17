@@ -122,3 +122,66 @@ async def change_post(user_id, post_data: dict) -> None:
         """
     await db.execute(query=query, values=post_data)
 
+
+async def check_owner(user_id: int, post_id: int) -> bool:
+    query = """
+        SELECT * FROM posts WHERE user_id = :user_id and id = :post_id
+        """
+    post = await db.fetch_one(
+        query=query, values={'user_id': user_id, 'post_id': post_id}
+    )
+    if post:
+        return True
+    return False
+
+
+async def get_rate(user_id: int, post_id: int) -> dict | None:
+    select_query = """
+        SELECT * FROM rates WHERE user_id = :user_id AND post_id = :post_id
+        """
+    rate_info = await db.fetch_one(
+        query=select_query, values={'user_id': user_id, 'post_id': post_id}
+    )
+    if rate_info:
+        return dict(rate_info._mapping)
+
+
+async def set_rate(user_id: int, post_id: int, rate: str):
+    if await check_owner(user_id, post_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You can't rate your own post",
+        )
+    final_data = {
+        'user_id': user_id, 'post_id': post_id,
+        'like': False, 'dislike': False
+    }
+    rate_info = await get_rate(user_id, post_id)
+    if rate_info:
+        if rate_info[rate] is True:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"You already {rate}d the post",
+            )
+        else:
+            if rate == 'like':
+                final_data['like'] = True
+            else:
+                final_data['dislike'] = True
+            update_query = """
+                UPDATE rates
+                SET "like" = :like, dislike = :dislike
+                WHERE user_id = :user_id AND post_id = :post_id
+                """
+            await db.execute(query=update_query,
+                             values=final_data)
+    else:
+        final_data[rate] = True
+        query = """
+            INSERT INTO rates VALUES (:user_id, :post_id, :like, :dislike)
+            """
+        await db.execute(query=query, values=final_data)
+
+
+async def delete_rate():
+    pass
