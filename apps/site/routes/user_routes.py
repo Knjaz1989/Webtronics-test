@@ -11,4 +11,3 @@ user_router.add_api_route(
     "/login", endpoint=login, methods=['POST'],
     response_model=TokenResponse
 )
-
