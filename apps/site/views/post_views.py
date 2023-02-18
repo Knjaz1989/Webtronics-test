@@ -1,8 +1,8 @@
 from fastapi import Depends
 
 from apps.site.utils import helpers as hls
-from apps.site.schemas.post_schemas import PostAdd, PostDelete, PostUpdate, \
-    PostRate, PostBase
+from apps.site.schemas.post_schemas import PostBase, PostAdd, PostUpdate, \
+    PostRate
 from apps.site.utils.dependencies import get_user
 
 
@@ -34,3 +34,8 @@ async def rate_post(post: PostRate, user: dict = Depends(get_user)):
     )
     return {"status": "Success",
             "msg": f'You paste {post.action.value} successfully'}
+
+
+async def unrate_post(post_data: PostBase, user: dict = Depends(get_user)):
+    await hls.delete_rate(user.get('id'), post_data.id)
+    return {"status": "Success", "msg": 'The rate was deleted successfully'}

@@ -183,5 +183,17 @@ async def set_rate(user_id: int, post_id: int, rate: str):
         await db.execute(query=query, values=final_data)
 
 
-async def delete_rate():
-    pass
+async def delete_rate(user_id: int, post_id: int):
+    query = """
+        DELETE FROM rates 
+        WHERE user_id = :user_id AND post_id = :post_id 
+        RETURNING *
+        """
+    rate = await db.fetch_one(
+        query=query, values={'user_id': user_id, 'post_id': post_id}
+    )
+    if not rate:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You haven't rated this post yet",
+        )
