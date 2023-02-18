@@ -29,7 +29,7 @@ class Post(Base):
 
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
     title = sa.Column(sa.VARCHAR(150))
-    text = sa.Column(sa.TEXT)
+    content = sa.Column(sa.TEXT)
     user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete='CASCADE'))
 
     def __str__(self):
