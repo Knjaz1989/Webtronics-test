@@ -9,7 +9,7 @@ class EnumAction(Enum):
 
 class PostAdd(BaseModel):
     title: str = Field(..., min_length=1)
-    text: str = Field(..., min_length=1)
+    content: str = Field(..., min_length=1)
 
 
 class PostBase(BaseModel):
@@ -24,7 +24,7 @@ class PostRate(PostBase):
 class PostUpdate(PostBase):
     """Inherit 'id' field from parent"""
     title: str = Field(None, min_length=1)
-    text: str = Field(None, min_length=1)
+    content: str = Field(None, min_length=1)
 
     @root_validator()
     def check_fields(cls, values):
