@@ -6,10 +6,14 @@ from pydantic import BaseModel, validator, EmailStr, Field
 from settings import config
 
 
-class UserLogin(BaseModel):
-    """Log in request schema."""
+class UserBase(BaseModel):
     email: EmailStr
     password: str
+
+
+class UserLogin(UserBase):
+    """Log in request schema.
+    Email and password inherits from parent"""
     expire_minutes: int = Field(config.TOKEN_EXPIRE_MINUTES, ge=1)
 
     @validator('email')
@@ -18,10 +22,9 @@ class UserLogin(BaseModel):
         return value.lower()
 
 
-class UserCreate(UserLogin):
-    """Sign up request schema"""
-    email: EmailStr
-    password: str
+class UserCreate(UserBase):
+    """Sign up request schema
+    Email and password inherits from parent"""
     name: str
 
 
