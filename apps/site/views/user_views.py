@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+from fastapi import Response, HTTPException, status
 
 from apps.site.utils import helpers as hls, db_handlers as db_h, jwt_token
 from apps.site.schemas.user_schemas import UserCreate, UserLogin
@@ -11,7 +11,7 @@ async def sign_up(user: UserCreate):
                             detail='Email already registered.')
     hash_password = hls.get_hash_password(user.password)
     await db_h.create_user(user.name, hash_password, user.email)
-    return {"status": "Success", "msg": "The user was created successfully"}
+    return Response(content="The user was created successfully")
 
 
 async def login(user: UserLogin):
