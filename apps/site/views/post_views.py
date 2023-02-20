@@ -30,14 +30,14 @@ async def change_post(
 
 async def rate_post(post: PostRate, user: dict = Depends(get_user)):
     await hls.set_rate(
-        user_id=user.get("id"), post_id=post.id, rate=post.action.value
+        user_id=user.get("id"), post_id=post.id, action=post.action.value
     )
     return {"status": "Success",
             "msg": f'You paste {post.action.value} successfully'}
 
 
 async def unrate_post(post_data: PostBase, user: dict = Depends(get_user)):
-    await hls.delete_rate(user.get('id'), post_data.id)
+    await db_h.delete_rate(user.get('id'), post_data.id)
     return {"status": "Success", "msg": 'The rate was deleted successfully'}
 
 

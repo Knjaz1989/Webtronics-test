@@ -32,7 +32,7 @@ async def create_post(user_id: int, title: str, content: str) -> None:
         """
     await db.execute(
         query=query,
-        values={'user_id': user_id, 'title': title, 'content': content}
+        values={'title': title, 'content': content, 'user_id': user_id}
     )
 
 
@@ -44,6 +44,18 @@ async def get_user_by_email(email: str) -> dict | None:
     user = await db.fetch_one(query=query, values={'email': email})
     if user:
         return dict(user._mapping)
+
+
+async def check_owner(user_id: int, post_id: int) -> bool:
+    query = """
+        SELECT * FROM posts WHERE user_id = :user_id and id = :post_id
+        """
+    post = await db.fetch_one(
+        query=query, values={'user_id': user_id, 'post_id': post_id}
+    )
+    if post:
+        return True
+    return False
 
 
 async def delete_post(user_id: int, post_id: int) -> dict | None:
@@ -121,3 +133,56 @@ async def search_posts(title: str = None, content: str = None):
         """
     posts = await db.fetch_all(query=query, values=new_values)
     return posts
+
+
+async def create_rate(user_id: int, post_id: int, rate: str):
+    values = {
+        'user_id': user_id, 'post_id': post_id, 'like': False,
+        'dislike': False
+    }
+    values[rate] = True
+    query = """
+        INSERT INTO rates VALUES (:user_id, :post_id, :like, :dislike)
+        """
+    await db.execute(query=query, values=values)
+
+
+async def delete_rate(user_id: int, post_id: int):
+    query = """
+        DELETE FROM rates 
+        WHERE user_id = :user_id AND post_id = :post_id 
+        RETURNING *
+        """
+    rate = await db.fetch_one(
+        query=query, values={'user_id': user_id, 'post_id': post_id}
+    )
+    if not rate:
+        return rate
+
+
+async def get_rate(user_id: int, post_id: int) -> dict | None:
+    select_query = """
+        SELECT * FROM rates WHERE user_id = :user_id AND post_id = :post_id
+        """
+    rate = await db.fetch_one(
+        query=select_query, values={'user_id': user_id, 'post_id': post_id}
+    )
+    if rate:
+        return dict(rate._mapping)
+
+
+async def update_rate(user_id: int, post_id: int, action: str):
+    final_data = {
+        'user_id': user_id, 'post_id': post_id, 'like': False,
+        'dislike': False
+    }
+    if action == 'like':
+        final_data['like'] = True
+    else:
+        final_data['dislike'] = True
+    update_query = """
+        UPDATE rates
+        SET "like" = :like, dislike = :dislike
+        WHERE user_id = :user_id AND post_id = :post_id
+        """
+    await db.execute(query=update_query, values=final_data)
