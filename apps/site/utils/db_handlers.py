@@ -6,7 +6,7 @@ async def create_user(
 ) -> None:
     """Add user into the database"""
     query = """
-        INSERT INTO users VALUES (DEFAULT, :name, :password, :email);
+        INSERT INTO users VALUES (DEFAULT, :name, :hashed_password, :email);
         """
     await db.execute(
         query=query,
@@ -41,9 +41,9 @@ async def get_user_by_email(email: str) -> dict | None:
     query = """
         SELECT * FROM users WHERE email = :email;
         """
-    user = db.fetch_one(query=query, values={'email': email})
+    user = await db.fetch_one(query=query, values={'email': email})
     if user:
-        return  dict(user._mapping)
+        return dict(user._mapping)
 
 
 async def delete_post(user_id: int, post_id: int) -> dict | None:
@@ -82,15 +82,6 @@ async def change_post(
     await db.execute(query=query, values=values)
 
 
-async def get_posts():
-    """Get all posts from the database"""
-    query = """
-        SELECT * FROM posts;
-        """
-    posts = await db.fetch_all(query=query)
-    return posts
-
-
 async def get_post(post_id: int) -> dict | None:
     """Get current post from the database"""
     query = """
@@ -101,16 +92,32 @@ async def get_post(post_id: int) -> dict | None:
         return dict(post._mapping)
 
 
+async def get_posts():
+    """Get all posts from the database"""
+    query = """
+        SELECT * FROM posts;
+        """
+    posts = await db.fetch_all(query=query)
+    return posts
+
+
+async def get_ids_of_all_users_posts(user_id: int):
+    pass
+
+
 async def search_posts(title: str = None, content: str = None):
     """Search posts from the database"""
     select_list = []
     values = {'title': title, 'content': content}
+    new_values = {}
     for key, value in values.items():
-        if not value:
-            values[key] = '%s'
-        select_list.append(f'{key} = :{key}')
+        if value:
+            select_list.append(
+                f"STRING_TO_ARRAY(LOWER({key}), ' ') && ARRAY[:{key}]"
+            )
+            new_values[key] = value
     query = f"""
-        SELECT * FROM posts WHERE {' AND '.join(select_list)}; 
+        SELECT id, title, content FROM posts WHERE {' AND '.join(select_list)}; 
         """
-    posts = db.fetch_all(query=query, values=values)
+    posts = await db.fetch_all(query=query, values=new_values)
     return posts

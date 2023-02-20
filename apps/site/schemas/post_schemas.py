@@ -21,8 +21,7 @@ class PostRate(PostBase):
     action: EnumAction
 
 
-class PostUpdate(PostBase):
-    """Inherit 'id' field from parent"""
+class PostSearch(BaseModel):
     title: str = Field(None, min_length=1)
     content: str = Field(None, min_length=1)
 
@@ -32,3 +31,18 @@ class PostUpdate(PostBase):
             raise ValueError(
                 "Expected two fields or one of 'title' or 'text'")
         return values
+
+
+class PostUpdate(PostBase, PostSearch):
+    """Inherit 'id' field from parent"""
+    # title: str = Field(None, min_length=1)
+    # content: str = Field(None, min_length=1)
+    #
+    # @root_validator()
+    # def check_fields(cls, values):
+    #     if not values.get('title') and not values.get('text'):
+    #         raise ValueError(
+    #             "Expected two fields or one of 'title' or 'text'")
+    #     return values
+
+
