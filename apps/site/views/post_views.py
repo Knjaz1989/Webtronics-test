@@ -16,6 +16,11 @@ async def get_all_posts(user: dict = Depends(get_user)):
     return {"status": "Success", "data": posts}
 
 
+async def get_current_post(post_data: PostBase,user: dict = Depends(get_user)):
+    post = db_h.get_post(post_id=post_data.id)
+    return {"status": "Success", "data": post}
+
+
 async def delete_post(post_data: PostBase, user: dict = Depends(get_user)):
     await db_h.delete_post(user.get("id"), post_data.id)
     return {"status": "Success", "msg": 'The post was deleted successfully'}
