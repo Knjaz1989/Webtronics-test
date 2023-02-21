@@ -1,7 +1,7 @@
 from fastapi import Response, HTTPException, status
 
 from apps.site.utils import helpers as hls, db_handlers as db_h, jwt_token
-from apps.site.schemas.user_schemas import UserCreate, UserLogin
+from apps.site.schemas.user import UserCreate, UserLogin
 
 
 async def sign_up(user: UserCreate):

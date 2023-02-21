@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from apps.site.schemas.user_schemas import TokenResponse
-from apps.site.views.user_views import sign_up, login
+from apps.site.schemas.user import TokenResponse
+from apps.site.views.user import sign_up, login
 
 user_router = APIRouter(prefix="/user", tags=["user"])
 

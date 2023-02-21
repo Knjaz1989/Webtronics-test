@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from apps.site.utils import helpers as hls, db_handlers as db_h
-from apps.site.schemas.post_schemas import PostBase, PostAdd, PostUpdate, \
+from apps.site.schemas.post import PostBase, PostAdd, PostUpdate, \
     PostRate, PostSearch
 from apps.site.utils.dependencies import get_user
 
