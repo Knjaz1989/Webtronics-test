@@ -7,10 +7,11 @@ class Config(BaseSettings):
     DB_BASE: str
     DB_HOST: str
     DB_PORT: str
-    SQLALCHEMY_URL: str
+    SYNC_SQLALCHEMY_URL: str
     ASYNC_SQLALCHEMY_URL: str
 
     SECRET = 'SECRET'
+    TEST_PASSWORD: str
 
     TOKEN_EXPIRE_MINUTES: int = 60
     ALGORITHM: str = 'HS256'

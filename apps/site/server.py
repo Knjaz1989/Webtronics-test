@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from apps.site.routes.user import user_router
 from apps.site.routes.post import post_router
-from database.db_connection import db
+from database.db_async import db
 
 
 app = FastAPI()

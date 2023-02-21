@@ -1,4 +1,4 @@
-from database.db_connection import db
+from database.db_async import db
 
 
 async def create_user(

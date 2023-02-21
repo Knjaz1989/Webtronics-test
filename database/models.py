@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
@@ -31,6 +31,7 @@ class Post(Base):
     title = sa.Column(sa.VARCHAR(150))
     content = sa.Column(sa.TEXT)
     user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete='CASCADE'))
+    user = relationship("User", backref="posts")
 
     def __str__(self):
         return f'{self.login}: {self.email}'
