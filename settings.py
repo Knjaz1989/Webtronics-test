@@ -7,8 +7,10 @@ class Config(BaseSettings):
     DB_BASE: str
     DB_HOST: str
     DB_PORT: str
+
     SYNC_SQLALCHEMY_URL: str
     ASYNC_SQLALCHEMY_URL: str
+    TEST_DATABASE_URL: str = 'postgresql://test:test@localhost:5432/test'
 
     SECRET = 'SECRET'
     TEST_PASSWORD: str
