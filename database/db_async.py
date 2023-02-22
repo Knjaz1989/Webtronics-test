@@ -7,7 +7,7 @@ from settings import config
 
 DATABASE_URL = config.ASYNC_SQLALCHEMY_URL
 
-db = Database(DATABASE_URL, force_rollback=True)
+db = Database(DATABASE_URL, force_rollback=False)
 
 
 # engine = create_async_engine(
