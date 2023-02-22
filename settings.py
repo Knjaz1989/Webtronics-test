@@ -12,6 +12,8 @@ class Config(BaseSettings):
     ASYNC_SQLALCHEMY_URL: str
     TEST_DATABASE_URL: str = 'postgresql://test:test@localhost:5432/test'
 
+    HUNTER_API_KEY: str
+
     SECRET = 'SECRET'
     TEST_PASSWORD: str
 
