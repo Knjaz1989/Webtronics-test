@@ -2,8 +2,7 @@ from datetime import datetime, timedelta
 import hashlib
 import requests
 
-from fastapi import HTTPException, status
-from jose import jwt, JWTError
+from jose import jwt
 
 from settings import config
 
@@ -29,7 +28,6 @@ def get_hash_password(password: str) -> str:
 def validate_password(password: str, hashed_password: str):
     """Validate password hash with db hash."""
     return get_hash_password(password) == hashed_password
-
 
 
 def verify_email(email: str) -> str | None:

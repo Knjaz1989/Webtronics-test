@@ -15,9 +15,9 @@ class UserBase(BaseModel):
     @validator('email')
     def check_email(cls, value):
         value = value.lower()
-        if verify_email(value):
-            return value
-        raise ValueError('This email is not valid')
+        if not verify_email(value):
+            raise ValueError('This email is not valid')
+        return value
 
 
 class UserLogin(UserBase):
