@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from apps.auth.routes import user_router
 from apps.posts.routes import post_router
-from database.db_async import db
+from database.db_async import engine
 
 
 app = FastAPI()
@@ -16,11 +16,11 @@ app.include_router(post_router)
 # )
 
 
-@app.on_event("startup")
-async def startup():
-    await db.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await db.disconnect()
+# @app.on_event("startup")
+# async def startup():
+#     await engine.connect()
+#
+#
+# @app.on_event("shutdown")
+# async def shutdown():
+#     await engine.disconnect()

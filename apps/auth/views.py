@@ -20,7 +20,7 @@ async def login(user: UserLogin, session=Depends(get_async_session)):
     db_user = await db_h.get_user_by_email(session, user.email)
     if not db_user or \
             not validate_password(
-                user.password, db_user.get("hashed_password")
+                user.password, db_user.hashed_password
             ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

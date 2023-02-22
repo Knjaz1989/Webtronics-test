@@ -16,3 +16,4 @@ class TestUser:
                 'name': 'Melanie', 'email': '40@mail.ru', 'password': '12345'}
         )
         assert response.status_code == 200
+

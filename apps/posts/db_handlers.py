@@ -1,63 +1,53 @@
-from database.db_async import db
+from sqlalchemy import insert, select, delete, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database.models import Post
 
 
-async def create_post(user_id: int, title: str, content: str) -> None:
+async def create_post(
+        session: AsyncSession,user_id: int, title: str, content: str,
+) -> None:
     """Add post into the database"""
-    query = """
-        INSERT INTO posts VALUES (DEFAULT, :title, :content, :user_id);
-        """
-    await db.execute(
-        query=query,
-        values={'title': title, 'content': content, 'user_id': user_id}
-    )
+    stmt = insert(Post).values(title=title, content=content, user_id=user_id)
+    await session.execute(stmt)
 
 
-async def check_owner(user_id: int, post_id: int) -> bool:
-    query = """
-        SELECT * FROM posts WHERE user_id = :user_id and id = :post_id
-        """
-    post = await db.fetch_one(
-        query=query, values={'user_id': user_id, 'post_id': post_id}
-    )
+async def check_owner(
+        session: AsyncSession, user_id: int, post_id: int
+) -> bool:
+    stmt = select(Post).where(Post.id == post_id, Post.user_id == user_id)
+    post = await session.execute(stmt)
+    post = post.scalars().first()
     if post:
         return True
     return False
 
 
-async def delete_post(user_id: int, post_id: int) -> dict | None:
+async def delete_post(
+        session: AsyncSession, user_id: int, post_id: int
+):
     """Delete post from the database"""
-    query = """
-        DELETE FROM posts
-        WHERE id = :post_id and user_id = :user_id
-        RETURNING *;
-        """
-    post = await db.fetch_one(
-        query=query, values={'user_id': user_id, 'id': post_id}
-    )
+    stmt = delete(Post).where(
+        Post.id == post_id, Post.user_id == user_id).returning(Post.id)
+    post = await session.execute(stmt)
+    post = post.scalars().first()
     if post:
-        return dict(post._mapping)
+        return post
 
 
 async def change_post(
-        post_id: int, title: str = None, content: str = None
+        session: AsyncSession, user_id: int, post_id: int, title: str = None,
+        content: str = None
 ):
     """Change current post in the database"""
-    set_list = []
     values = {'title': title, 'content': content}
     for key, value in values.copy().items():
-        if value:
-            set_list.append(f'{key} = :{key}')
-        else:
+        if not value:
             del values[key]
-    if not set_list:
-        return
-    values['id'] = post_id
-    query = f"""
-        UPDATE posts 
-        SET {', '.join(set_list)}
-        WHERE id = :id;
-        """
-    await db.execute(query=query, values=values)
+    stmt = update(Post).where(
+        Post.id == post_id, Post.user_id == user_id
+    ).values(**values)
+    await session.execute(stmt)
 
 
 async def get_post(post_id: int) -> dict | None:

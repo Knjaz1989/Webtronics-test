@@ -20,9 +20,6 @@ class User(Base):
     def __str__(self):
         return f'{self.login}: {self.email}'
 
-    def __repr__(self):
-        return f'{self.login}: {self.email}'
-
 
 class Post(Base):
     __tablename__ = 'posts'
@@ -30,7 +27,9 @@ class Post(Base):
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
     title = sa.Column(sa.VARCHAR(150))
     content = sa.Column(sa.TEXT)
-    user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete='CASCADE'))
+    user_id = sa.Column(
+        sa.Integer, sa.ForeignKey('users.id', ondelete='CASCADE')
+    )
     user = relationship("User", backref="posts")
 
     def __str__(self):
@@ -45,19 +44,16 @@ class Rates(Base):
 
     user_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(User.id, ondelete='CASCADE'),
+        sa.ForeignKey('users.id', ondelete='CASCADE'),
         primary_key=True
     )
     post_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(Post.id, ondelete='CASCADE'),
+        sa.ForeignKey('posts.id', ondelete='CASCADE'),
         primary_key=True
     )
     like = sa.Column(sa.Boolean, server_default=sa.sql.text('false'))
     dislike = sa.Column(sa.Boolean, server_default=sa.text('false'))
 
     def __str__(self):
-        return f'user: {self.user_id} - post: {self.post_id}'
-
-    def __repr__(self):
         return f'user: {self.user_id} - post: {self.post_id}'

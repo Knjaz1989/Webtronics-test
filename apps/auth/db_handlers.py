@@ -20,11 +20,11 @@ async def delete_user(user_id: int, session: AsyncSession) -> None:
     await session.execute(stmt)
 
 
-async def get_user_by_email(session: AsyncSession, email: str) -> dict | None:
+async def get_user_by_email(session: AsyncSession, email: str):
     """Get user from the database by email"""
     stmt = select(User).where(User.email == email)
     print(stmt)
-    user = await session.execute(stmt)
-    user = user.first()
-    if user:
-        return user
+    user_db = await session.execute(stmt)
+    user_db = user_db.scalars().first()
+    if user_db:
+        return user_db
