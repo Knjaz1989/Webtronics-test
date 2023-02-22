@@ -1,35 +1,30 @@
-from database.db_async import db
+from sqlalchemy import select, insert, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database.models import User
 
 
 async def create_user(
-    user_name: str, hashed_password: str, email: str
+    session: AsyncSession, user_name: str, hashed_password: str, email: str
 ) -> None:
     """Add user into the database"""
-    query = """
-        INSERT INTO users VALUES (DEFAULT, :name, :hashed_password, :email);
-        """
-    await db.execute(
-        query=query,
-        values={
-            'name': user_name, 'hashed_password': hashed_password,
-            'email': email
-        }
+    stmt = insert(User).values(
+        name=user_name, hashed_password=hashed_password, email=email
     )
+    await session.execute(stmt)
 
 
-async def delete_user(user_id: int) -> None:
+async def delete_user(user_id: int, session: AsyncSession) -> None:
     """Delete user from the database"""
-    query = """
-        DELETE FROM users WHERE id = :id;
-        """
-    await db.execute(query=query, values={'id': user_id})
+    stmt = delete(User).where(User.id == user_id)
+    await session.execute(stmt)
 
 
-async def get_user_by_email(email: str) -> dict | None:
+async def get_user_by_email(session: AsyncSession, email: str) -> dict | None:
     """Get user from the database by email"""
-    query = """
-        SELECT * FROM users WHERE email = :email;
-        """
-    user = await db.fetch_one(query=query, values={'email': email})
+    stmt = select(User).where(User.email == email)
+    print(stmt)
+    user = await session.execute(stmt)
+    user = user.first()
     if user:
-        return dict(user._mapping)
+        return user
