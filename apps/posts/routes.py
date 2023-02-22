@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from apps.site.views import post as pv
-
+from apps.posts import views as pv
 
 post_router = APIRouter(prefix="/post", tags=["post"])
 

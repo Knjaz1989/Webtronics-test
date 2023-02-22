@@ -1,9 +1,9 @@
 from fastapi import Depends
 
-from apps.site.utils import helpers as hls, db_handlers as db_h
-from apps.site.schemas.post import PostBase, PostAdd, PostUpdate, \
+from . import helpers as hls, db_handlers as db_h
+from .dependencies import get_user
+from .schemas import PostBase, PostAdd, PostUpdate, \
     PostRate, PostSearch
-from apps.site.utils.dependencies import get_user
 
 
 async def add_post(post: PostAdd, user: dict = Depends(get_user)):
@@ -16,7 +16,9 @@ async def get_all_posts(user: dict = Depends(get_user)):
     return {"status": "Success", "data": posts}
 
 
-async def get_current_post(post_data: PostBase,user: dict = Depends(get_user)):
+async def get_current_post(
+        post_data: PostBase, user: dict = Depends(get_user)
+):
     post = db_h.get_post(post_id=post_data.id)
     return {"status": "Success", "data": post}
 

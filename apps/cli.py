@@ -26,7 +26,7 @@ def run(
     """Run server"""
     import uvicorn
 
-    app_name = 'apps.site.server:app'
+    app_name = 'apps.server:app'
 
     uvicorn.run(
         app_name,

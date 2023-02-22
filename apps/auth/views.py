@@ -1,7 +1,8 @@
 from fastapi import Response, HTTPException, status
 
-from apps.site.utils import helpers as hls, db_handlers as db_h, jwt_token
-from apps.site.schemas.user import UserCreate, UserLogin
+from . import helpers as hls, db_handlers as db_h
+from .schemas import UserCreate, UserLogin
+from .utils import create_token
 
 
 async def sign_up(user: UserCreate):
@@ -26,5 +27,5 @@ async def login(user: UserLogin):
             headers={"WWW-Authenticate": "Bearer"},
         )
     user.password = hls.get_hash_password(user.password)
-    access_token, expires = jwt_token.create_token(data=user.dict())
+    access_token, expires = create_token(data=user.dict())
     return {"access_token": access_token, "expires": expires}

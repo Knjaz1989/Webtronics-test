@@ -4,10 +4,11 @@ from typing import Optional
 from pydantic import BaseModel, validator, EmailStr, Field
 
 from settings import config
-from ..utils.email_hunter import verify_email
+from apps.auth.utils import verify_email
 
 
 class UserBase(BaseModel):
+    """User base schema"""
     email: EmailStr
     password: str
 
