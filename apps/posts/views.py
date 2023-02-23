@@ -23,7 +23,7 @@ async def get_current_post(
         post_data: PostBase, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    post = db_h.get_post(post_id=post_data.id)
+    post = await db_h.get_post(post_id=post_data.id)
     return {"status": "Success", "data": post}
 
 
@@ -31,6 +31,7 @@ async def delete_post(
         post_data: PostBase, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
+    await hls.check_owner(session, user.id, post_data.id)
     await db_h.delete_post(session, user.id, post_data.id)
     return {"status": "Success", "msg": 'The post was deleted successfully'}
 
@@ -39,15 +40,8 @@ async def change_post(
         post_data: PostUpdate, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    answer = await db_h.check_owner(session, user.id, post_data.id)
-    if not answer:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='You have not such post'
-        )
-    await db_h.change_post(
-        session, user.id, post_data.id, post_data.title, post_data.content
-    )
+    await hls.check_owner(session, user.id, post_data.id)
+    await db_h.change_post(session, user.id, post_data.dict())
     return {"status": "Success", "msg": 'The post was changed successfully'}
 
 

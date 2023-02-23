@@ -12,15 +12,13 @@ async def create_post(
     await session.execute(stmt)
 
 
-async def check_owner(
-        session: AsyncSession, user_id: int, post_id: int
-) -> bool:
+async def get_own_post(
+        session: AsyncSession, user_id: int, post_id: int):
     stmt = select(Post).where(Post.id == post_id, Post.user_id == user_id)
     post = await session.execute(stmt)
     post = post.scalars().first()
     if post:
-        return True
-    return False
+        return post
 
 
 async def delete_post(
@@ -28,25 +26,21 @@ async def delete_post(
 ):
     """Delete post from the database"""
     stmt = delete(Post).where(
-        Post.id == post_id, Post.user_id == user_id).returning(Post.id)
+        Post.id == post_id, Post.user_id == user_id
+    ).returning(Post.id)
     post = await session.execute(stmt)
     post = post.scalars().first()
     if post:
         return post
 
 
-async def change_post(
-        session: AsyncSession, user_id: int, post_id: int, title: str = None,
-        content: str = None
-):
+async def change_post(session: AsyncSession, user_id: int, post_data: dict):
     """Change current post in the database"""
-    values = {'title': title, 'content': content}
-    for key, value in values.copy().items():
-        if not value:
-            del values[key]
+    post_id = post_data.pop('id')
+    post_data = {key: value for key, value in post_data.items() if value}
     stmt = update(Post).where(
         Post.id == post_id, Post.user_id == user_id
-    ).values(**values)
+    ).values(**post_data)
     await session.execute(stmt)
 
 

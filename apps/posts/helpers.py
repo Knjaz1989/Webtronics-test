@@ -7,7 +7,7 @@ from apps.posts import db_handlers as db_h
 async def check_owner(
         session: AsyncSession, user_id: int, post_id: int
 ):
-    post = db_h.get_own_post(session, user_id, post_id)
+    post = await db_h.get_own_post(session, user_id, post_id)
     if not post:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
