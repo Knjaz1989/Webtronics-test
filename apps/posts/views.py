@@ -31,7 +31,7 @@ async def delete_post(
         post_data: PostBase, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    await hls.is_owner(session, user.id, post_data.id)
+    await hls.is_post_owner(session, user.id, post_data.id)
     await db_h.delete_post(session, user.id, post_data.id)
     return {"status": "Success", "msg": 'The post was deleted successfully'}
 
@@ -40,7 +40,7 @@ async def change_post(
         post_data: PostUpdate, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    await hls.is_owner(session, user.id, post_data.id)
+    await hls.is_post_owner(session, user.id, post_data.id)
     await db_h.change_post(session, user.id, post_data.dict())
     return {"status": "Success", "msg": 'The post was changed successfully'}
 
@@ -49,7 +49,7 @@ async def rate_post(
         post: PostRate, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    await hls.is_not_owner(session, user.id, post.id)
+    await hls.is_not_post_owner(session, user.id, post.id)
     await hls.set_rate(
         session, user_id=user.id, post_id=post.id,
         action=post.action.value
@@ -58,8 +58,12 @@ async def rate_post(
             "msg": f'You paste {post.action.value} successfully'}
 
 
-async def unrate_post(post_data: PostBase, user: dict = Depends(get_user)):
-    await db_h.delete_rate(user.get('id'), post_data.id)
+async def unrate_post(
+        post: PostBase, user=Depends(get_user),
+        session=Depends(get_async_session)
+):
+    await hls.is_rate_owner(session, user.id, post.id)
+    await db_h.delete_rate(session, user.id, post.id)
     return {"status": "Success", "msg": 'The rate was deleted successfully'}
 
 

@@ -35,9 +35,6 @@ class Post(Base):
     def __str__(self):
         return f'{self.login}: {self.email}'
 
-    def __repr__(self):
-        return f'{self.login}: {self.email}'
-
 
 class Rates(Base):
     __tablename__ = 'rates'

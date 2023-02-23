@@ -1,7 +1,7 @@
 from sqlalchemy import insert, select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import Post
+from database.models import Post, Rates
 
 
 async def create_post(
@@ -85,54 +85,52 @@ async def search_posts(title: str = None, content: str = None):
     return posts
 
 
-async def create_rate(user_id: int, post_id: int, rate: str):
-    values = {
-        'user_id': user_id, 'post_id': post_id, 'like': False,
-        'dislike': False
-    }
+async def create_rate(
+        session: AsyncSession, user_id: int, post_id: int, rate: str
+):
+    values = {'like': False, 'dislike': False}
     values[rate] = True
-    query = """
-        INSERT INTO rates VALUES (:user_id, :post_id, :like, :dislike)
-        """
-    await db.execute(query=query, values=values)
+    stmt = insert(Rates).values(
+        user_id=user_id, post_id=post_id, **values
+    )
+    await session.execute(stmt)
 
 
-async def delete_rate(user_id: int, post_id: int):
+async def delete_rate(session: AsyncSession, user_id: int, post_id: int):
     query = """
         DELETE FROM rates 
         WHERE user_id = :user_id AND post_id = :post_id 
         RETURNING *
         """
-    rate = await db.fetch_one(
-        query=query, values={'user_id': user_id, 'post_id': post_id}
+    stmt = delete(Rates).where(
+        Rates.user_id == user_id, Rates.post_id == post_id
     )
+    rate = await session.execute(stmt)
     if not rate:
         return rate
 
 
-async def get_rate(user_id: int, post_id: int) -> dict | None:
-    select_query = """
-        SELECT * FROM rates WHERE user_id = :user_id AND post_id = :post_id
-        """
-    rate = await db.fetch_one(
-        query=select_query, values={'user_id': user_id, 'post_id': post_id}
+async def get_own_rate(
+        session: AsyncSession, user_id: int, post_id: int
+):
+    stmt = select(Rates).where(
+        Rates.user_id == user_id, Rates.post_id == post_id
     )
+    rate = await session.execute(stmt)
+    rate = rate.scalars().first()
     if rate:
-        return dict(rate._mapping)
+        return rate
 
 
-async def update_rate(user_id: int, post_id: int, action: str):
-    final_data = {
-        'user_id': user_id, 'post_id': post_id, 'like': False,
-        'dislike': False
-    }
+async def update_rate(
+        session: AsyncSession, user_id: int, post_id: int, action: str
+):
+    values = {'like': False, 'dislike': False}
     if action == 'like':
-        final_data['like'] = True
+        values['like'] = True
     else:
-        final_data['dislike'] = True
-    update_query = """
-        UPDATE rates
-        SET "like" = :like, dislike = :dislike
-        WHERE user_id = :user_id AND post_id = :post_id
-        """
-    await db.execute(query=update_query, values=final_data)
+        values['dislike'] = True
+    stmt = update(Rates). \
+        where(Rates.post_id == post_id, Rates.user_id == user_id).\
+        values(**values)
+    await session.execute(stmt)
