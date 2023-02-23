@@ -1,4 +1,4 @@
-from sqlalchemy import insert, select, delete, update
+from sqlalchemy import insert, select, delete, update, text, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import Post, Rates
@@ -46,9 +46,6 @@ async def change_post(session: AsyncSession, user_id: int, post_data: dict):
 
 async def get_post(session: AsyncSession, post_id: int):
     """Get current post from the database"""
-    query = """
-        SELECT * FROM posts WHERE id = :id;
-        """
     stmt = select(Post).where(Post.id == post_id)
     post = await session.execute(stmt)
     post = post.scalars().first()
@@ -66,11 +63,10 @@ async def get_posts(session: AsyncSession):
     return posts
 
 
-async def get_ids_of_all_users_posts(user_id: int):
-    pass
+async def search_posts(
+        session: AsyncSession, title: str = None, content: str = None
 
-
-async def search_posts(title: str = None, content: str = None):
+):
     """Search posts from the database"""
     select_list = []
     values = {'title': title, 'content': content}
@@ -81,10 +77,15 @@ async def search_posts(title: str = None, content: str = None):
                 f"STRING_TO_ARRAY(LOWER({key}), ' ') && ARRAY[:{key}]"
             )
             new_values[key] = value
-    query = f"""
-        SELECT id, title, content FROM posts WHERE {' AND '.join(select_list)}; 
-        """
-    posts = await db.fetch_all(query=query, values=new_values)
+    stmt = text(f"""
+        SELECT id, title, content FROM posts WHERE {' AND '.join(select_list)};
+        """)
+    # stmt = select(Post.id, Post.title, Post.content).\
+    #     where(text(f"{' AND '.join(select_list)}"))
+    posts = await session.execute(stmt, params=new_values)
+    keys = posts.keys()
+    posts = posts.all()
+    posts = [dict(zip(keys, item)) for item in posts]
     return posts
 
 
@@ -100,11 +101,6 @@ async def create_rate(
 
 
 async def delete_rate(session: AsyncSession, user_id: int, post_id: int):
-    query = """
-        DELETE FROM rates 
-        WHERE user_id = :user_id AND post_id = :post_id 
-        RETURNING *
-        """
     stmt = delete(Rates).where(
         Rates.user_id == user_id, Rates.post_id == post_id
     )

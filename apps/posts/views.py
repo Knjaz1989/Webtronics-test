@@ -69,6 +69,11 @@ async def unrate_post(
     return {"status": "Success", "msg": 'The rate was deleted successfully'}
 
 
-async def search_post(post_data: PostSearch, user: dict = Depends(get_user)):
-    posts = await db_h.search_posts(post_data.title, post_data.content)
+async def search_post(
+        post_data: PostSearch, user: dict = Depends(get_user),
+        session=Depends(get_async_session)
+):
+    posts = await db_h.search_posts(
+        session, post_data.title, post_data.content
+    )
     return {'status': 'Success', 'data': posts}
