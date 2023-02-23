@@ -14,8 +14,10 @@ async def add_post(
     return {"status": "Success", "msg": "The post was created successfully"}
 
 
-async def get_all_posts(user: dict = Depends(get_user)):
-    posts = await db_h.get_posts()
+async def get_all_posts(
+        user=Depends(get_user), session=Depends(get_async_session)
+):
+    posts = await db_h.get_posts(session)
     return {"status": "Success", "data": posts}
 
 

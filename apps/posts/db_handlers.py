@@ -56,12 +56,13 @@ async def get_post(session: AsyncSession, post_id: int):
         return post
 
 
-async def get_posts():
+async def get_posts(session: AsyncSession):
     """Get all posts from the database"""
-    query = """
-        SELECT * FROM posts;
-        """
-    posts = await db.fetch_all(query=query)
+    stmt = select(Post.id, Post.title, Post.content)
+    posts = await session.execute(stmt)
+    keys = posts.keys()
+    posts = posts.all()
+    posts = [dict(zip(keys, item)) for item in posts]
     return posts
 
 
