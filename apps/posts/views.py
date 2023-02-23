@@ -20,10 +20,10 @@ async def get_all_posts(user: dict = Depends(get_user)):
 
 
 async def get_current_post(
-        post_data: PostBase, user=Depends(get_user),
+        post: PostBase, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    post = await db_h.get_post(post_id=post_data.id)
+    post = await db_h.get_post(session, post.id)
     return {"status": "Success", "data": post}
 
 

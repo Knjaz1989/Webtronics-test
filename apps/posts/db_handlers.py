@@ -44,14 +44,16 @@ async def change_post(session: AsyncSession, user_id: int, post_data: dict):
     await session.execute(stmt)
 
 
-async def get_post(post_id: int) -> dict | None:
+async def get_post(session: AsyncSession, post_id: int):
     """Get current post from the database"""
     query = """
         SELECT * FROM posts WHERE id = :id;
         """
-    post = db.fetch_one(query=query, values={'id': post_id})
+    stmt = select(Post).where(Post.id == post_id)
+    post = await session.execute(stmt)
+    post = post.scalars().first()
     if post:
-        return dict(post._mapping)
+        return post
 
 
 async def get_posts():
@@ -106,6 +108,7 @@ async def delete_rate(session: AsyncSession, user_id: int, post_id: int):
         Rates.user_id == user_id, Rates.post_id == post_id
     )
     rate = await session.execute(stmt)
+    rate = rate.scalars().first()
     if not rate:
         return rate
 
