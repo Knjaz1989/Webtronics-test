@@ -31,7 +31,7 @@ async def delete_post(
         post_data: PostBase, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    await hls.check_owner(session, user.id, post_data.id)
+    await hls.is_owner(session, user.id, post_data.id)
     await db_h.delete_post(session, user.id, post_data.id)
     return {"status": "Success", "msg": 'The post was deleted successfully'}
 
@@ -40,14 +40,19 @@ async def change_post(
         post_data: PostUpdate, user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    await hls.check_owner(session, user.id, post_data.id)
+    await hls.is_owner(session, user.id, post_data.id)
     await db_h.change_post(session, user.id, post_data.dict())
     return {"status": "Success", "msg": 'The post was changed successfully'}
 
 
-async def rate_post(post: PostRate, user: dict = Depends(get_user)):
+async def rate_post(
+        post: PostRate, user=Depends(get_user),
+        session=Depends(get_async_session)
+):
+    await hls.is_not_owner(session, user.id, post.id)
     await hls.set_rate(
-        user_id=user.get("id"), post_id=post.id, action=post.action.value
+        session, user_id=user.id, post_id=post.id,
+        action=post.action.value
     )
     return {"status": "Success",
             "msg": f'You paste {post.action.value} successfully'}
