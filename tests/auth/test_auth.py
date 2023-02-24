@@ -5,6 +5,7 @@ from tests.conftest import async_test_session
 
 
 class TestAuth:
+    prefix = '/user'
     email_real = 'knjaz1989@gmail.com'
     password_real = '12345678'
     email_test = '1@1.ru'
@@ -19,7 +20,7 @@ class TestAuth:
             self, async_client, name, password, email, code
     ):
         response = await async_client.post(
-            "/user/sign-up",
+            f"{self.prefix}/sign-up",
             json={'name': name, 'email': email, 'password': password}
         )
 
@@ -51,7 +52,7 @@ class TestAuth:
     @pytest.mark.parametrize('email,password,code', testdata)
     async def test_user_login(self, async_client, email, password, code):
         response = await async_client.post(
-            "/user/login",
+            f"{self.prefix}/login",
             json={'email': email, 'password': password}
         )
 

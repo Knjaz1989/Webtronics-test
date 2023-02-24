@@ -3,7 +3,7 @@ import asyncio
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession,\
     async_sessionmaker
-import pytest, pytest_asyncio
+import pytest
 
 from apps.server import app
 from database.db_async import get_async_session
@@ -27,7 +27,7 @@ async def get_test_async_session() -> AsyncSession:
 app.dependency_overrides[get_async_session] = get_test_async_session
 
 
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(autouse=True, scope='class')
 async def prepare_database():
     async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -48,3 +48,20 @@ def event_loop():
 async def async_client():
     async with AsyncClient(app=app, base_url='http://test') as client:
         yield client
+
+
+@pytest.fixture(scope='class')
+async def token(async_client):
+    response_1 = await async_client.post(
+        "/user/sign-up",
+        json={
+            'name': 'Igor', 'email': 'knjaz1989@gmail.com',
+            'password': '12345678'
+        }
+    )
+    response_2 = await async_client.post(
+        "/user/login",
+        json={'email': 'knjaz1989@gmail.com', 'password': '12345678'}
+    )
+    token = response_2.json().get('access_token')
+    return token
