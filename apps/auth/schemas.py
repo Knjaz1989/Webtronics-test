@@ -10,7 +10,7 @@ from apps.auth.utils import verify_email
 class UserBase(BaseModel):
     """User base schema"""
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8)
 
     @validator('email')
     def check_email(cls, value):

@@ -11,15 +11,15 @@ from database.models import Base
 from settings import config
 
 
-test_engine = create_async_engine(config.TEST_ASYNC_SQLALCHEMY_URL, echo=True)
+engine_test = create_async_engine(config.TEST_ASYNC_SQLALCHEMY_URL)
 
-test_async_session = async_sessionmaker(
-    test_engine, class_=AsyncSession, expire_on_commit=False
+async_test_session = async_sessionmaker(
+    engine_test, class_=AsyncSession, expire_on_commit=False
 )
 
 
 async def get_test_async_session() -> AsyncSession:
-    async with test_async_session() as session:
+    async with async_test_session() as session:
         yield session
         await session.commit()
 
@@ -29,10 +29,10 @@ app.dependency_overrides[get_async_session] = get_test_async_session
 
 @pytest.fixture(autouse=True, scope='session')
 async def prepare_database():
-    async with test_engine.begin() as conn:
+    async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    async with test_engine.begin() as conn:
+    async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
 
