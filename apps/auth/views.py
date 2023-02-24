@@ -1,4 +1,5 @@
 from fastapi import Depends, Response, HTTPException, status
+from fastapi.responses import JSONResponse
 
 from database.db_async import get_async_session
 from . import db_handlers as db_h
@@ -13,7 +14,10 @@ async def sign_up(user: UserCreate, session=Depends(get_async_session)):
                             detail='Email already registered.')
     hash_password = get_hash_password(user.password)
     await db_h.create_user(session, user.name, hash_password, user.email)
-    return Response(content="The user was created successfully")
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={'detail': 'The user was created successfully'}
+    )
 
 
 async def login(user: UserLogin, session=Depends(get_async_session)):
