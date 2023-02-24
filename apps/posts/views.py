@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
+from fastapi.responses import JSONResponse
 
 from database.db_async import get_async_session
 from . import helpers as hls, db_handlers as db_h
@@ -11,7 +12,11 @@ async def add_post(
     post: PostAdd, user=Depends(get_user), session=Depends(get_async_session)
 ):
     await db_h.create_post(session, user.id, post.title, post.content)
-    return {"status": "Success", "msg": "The post was created successfully"}
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            "detail": "The post was created successfully"}
+    )
 
 
 async def get_all_posts(

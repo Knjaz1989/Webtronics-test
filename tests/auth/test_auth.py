@@ -6,10 +6,11 @@ from tests.conftest import async_test_session
 
 class TestAuth:
     email_real = 'knjaz1989@gmail.com'
+    password_real = '12345678'
     email_test = '1@1.ru'
 
     testdata = [
-        ('Igor', '12345678', email_real, 201),
+        ('Igor', password_real, email_real, 201),
         ('Vasya', '12345', email_test, 422),
     ]
 
@@ -37,6 +38,8 @@ class TestAuth:
             user = await get_user_by_email(session, email)
 
             assert bool(user) is bool_value
+            if bool(user):
+                assert user.hashed_password != self.password_real
 
     testdata = [
         (email_real, '123456', 422),        # short password
