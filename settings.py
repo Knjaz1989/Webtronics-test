@@ -13,6 +13,8 @@ class Config(BaseSettings):
     SYNC_SQLALCHEMY_URL: str
     ASYNC_SQLALCHEMY_URL: str
     TEST_DATABASE_URL: str = 'postgresql://test:test@localhost:5432/test'
+    TEST_ASYNC_SQLALCHEMY_URL = \
+        'postgresql+asyncpg://test:test@localhost:5432/test'
 
     HUNTER_API_KEY: str
 
