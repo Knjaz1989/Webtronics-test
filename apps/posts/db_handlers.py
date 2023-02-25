@@ -1,6 +1,7 @@
 from sqlalchemy import insert, select, delete, update, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.main_helpers import model_to_dict
 from database.models import Post, Rates
 
 
@@ -13,7 +14,7 @@ async def create_post(
         returning(Post)
     post = await session.execute(stmt)
     post = post.scalars().first()
-    return post
+    return model_to_dict(post)
 
 
 async def get_own_post(
