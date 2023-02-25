@@ -1,15 +1,19 @@
-from sqlalchemy import insert, select, delete, update, text, func
+from sqlalchemy import insert, select, delete, update, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import Post, Rates
 
 
 async def create_post(
-        session: AsyncSession,user_id: int, title: str, content: str,
+        session: AsyncSession, user_id: int, title: str, content: str,
 ) -> None:
     """Add post into the database"""
-    stmt = insert(Post).values(title=title, content=content, user_id=user_id)
-    await session.execute(stmt)
+    stmt = insert(Post).\
+        values(title=title, content=content, user_id=user_id).\
+        returning(Post)
+    post = await session.execute(stmt)
+    post = post.scalars().first()
+    return post
 
 
 async def get_own_post(
