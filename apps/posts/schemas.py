@@ -22,8 +22,12 @@ class PostDataResponse(BaseModel):
         extra = Extra.ignore
 
 
-class PostAddResponse(BaseModel):
+class BaseResponse(BaseModel):
     detail: str
+
+
+class PostAddGetResponse(BaseResponse):
+    """Inherit 'detail' field from parent"""
     data: PostDataResponse
 
 

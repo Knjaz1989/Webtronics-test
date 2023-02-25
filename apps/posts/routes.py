@@ -1,16 +1,19 @@
 from fastapi import APIRouter, status
 
 from apps.posts import views as pv
-from apps.posts.schemas import PostAddResponse
+from apps.posts.schemas import PostAddGetResponse
 
 
 post_router = APIRouter(prefix="/post", tags=["post"])
 
 
-post_router.add_api_route("/", endpoint=pv.get_current_post, methods=["GET"])
+post_router.add_api_route(
+    path="/", endpoint=pv.get_current_post, methods=["GET"],
+    response_model=PostAddGetResponse
+)
 post_router.add_api_route(
     path="/", endpoint=pv.add_post, methods=["POST"],
-    response_model=PostAddResponse, status_code=status.HTTP_201_CREATED
+    response_model=PostAddGetResponse, status_code=status.HTTP_201_CREATED
 )
 post_router.add_api_route("/", endpoint=pv.delete_post, methods=["DELETE"])
 post_router.add_api_route("/", endpoint=pv.change_post, methods=["PATCH"])

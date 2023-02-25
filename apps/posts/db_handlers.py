@@ -55,7 +55,7 @@ async def get_post(session: AsyncSession, post_id: int):
     post = await session.execute(stmt)
     post = post.scalars().first()
     if post:
-        return post
+        return model_to_dict(post)
 
 
 async def get_posts(session: AsyncSession):

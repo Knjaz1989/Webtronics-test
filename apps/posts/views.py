@@ -1,12 +1,9 @@
-from fastapi import Depends, Response, status
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi import Depends, Query, HTTPException, status
 
 from database.db_async import get_async_session
 from . import helpers as hls, db_handlers as db_h
 from .dependencies import get_user
-from .schemas import PostBase, PostAdd, PostUpdate, \
-    PostRate, PostSearch, PostAddResponse, PostDataResponse
+from .schemas import PostBase, PostAdd, PostUpdate, PostRate, PostSearch
 
 
 async def add_post(
@@ -29,11 +26,16 @@ async def get_all_posts(
 
 
 async def get_current_post(
-        post: PostBase, user=Depends(get_user),
+        post_id: int = Query(..., ge=1), user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    post = await db_h.get_post(session, post.id)
-    return {"status": "Success", "data": post}
+    post = await db_h.get_post(session, post_id)
+    if not post:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="There is no such post"
+        )
+    return {"detail": "Success", "data": post}
 
 
 async def delete_post(
