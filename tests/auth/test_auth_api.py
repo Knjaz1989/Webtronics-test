@@ -12,7 +12,9 @@ class TestAuth:
 
     testdata = [
         ('Igor', password_real, email_real, 201),
-        ('Vasya', '12345', email_test, 422),
+        ('Vasya', '123456789', email_test, 422),
+        ('Dima', '1234567', 'knjaz1989@rambler.ru', 422),
+        ('Petya', '12345678', email_test, 422),
     ]
 
     @pytest.mark.parametrize('name,password,email,code', testdata)
