@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import List
+
 from pydantic import BaseModel, Field, root_validator, Extra
 
 
@@ -29,6 +31,10 @@ class BaseResponse(BaseModel):
 class PostAddGetResponse(BaseResponse):
     """Inherit 'detail' field from parent"""
     data: PostDataResponse
+
+
+class PostGetAllResponse(BaseResponse):
+    data: List[PostDataResponse]
 
 
 class PostBase(BaseModel):

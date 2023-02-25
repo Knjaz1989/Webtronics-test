@@ -19,10 +19,11 @@ async def add_post(
 
 
 async def get_all_posts(
+        limit: int = Query(15, ge=1, le=30), page: int = Query(1, ge=1),
         user=Depends(get_user), session=Depends(get_async_session)
 ):
-    posts = await db_h.get_posts(session)
-    return {"status": "Success", "data": posts}
+    posts = await db_h.get_posts(session, limit, page)
+    return {"detail": "Success", "data": posts}
 
 
 async def get_current_post(

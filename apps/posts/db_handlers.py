@@ -1,7 +1,7 @@
 from sqlalchemy import insert, select, delete, update, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.main_helpers import model_to_dict
+from apps.main_helpers import model_to_dict, models_to_dict
 from database.models import Post, Rates
 
 
@@ -58,13 +58,12 @@ async def get_post(session: AsyncSession, post_id: int):
         return model_to_dict(post)
 
 
-async def get_posts(session: AsyncSession):
+async def get_posts(session: AsyncSession, limit: int, page: int):
     """Get all posts from the database"""
-    stmt = select(Post.id, Post.title, Post.content)
+    stmt = select(Post).offset(page * limit + 1 - limit).limit(limit)
     posts = await session.execute(stmt)
-    keys = posts.keys()
-    posts = posts.all()
-    posts = [dict(zip(keys, item)) for item in posts]
+    posts = posts.scalars().all()
+    posts = models_to_dict(posts)
     return posts
 
 
