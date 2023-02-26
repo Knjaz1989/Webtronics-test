@@ -11,11 +11,6 @@ class User(Base):
     name = sa.Column(sa.String(40), nullable=False)
     hashed_password = sa.Column(sa.String(), nullable=False)
     email = sa.Column(sa.String(50), unique=True, index=True)
-    is_active = sa.Column(
-        sa.Boolean,
-        server_default=sa.sql.expression.true(),
-        nullable=False,
-    )
 
     def __str__(self):
         return f'{self.login}: {self.email}'
