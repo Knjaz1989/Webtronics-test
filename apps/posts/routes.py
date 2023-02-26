@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status
 
 from apps.posts import views as pv
-from apps.posts.schemas import PostAddGetResponse, PostGetAllResponse
-
+from apps.posts.schemas import PostAddGetResponse, PostGetAllResponse, \
+    BaseResponse
 
 post_router = APIRouter(prefix="/post", tags=["post"])
 
@@ -28,4 +28,7 @@ post_router.add_api_route(
 )
 
 post_router.add_api_route("/rate", endpoint=pv.rate_post, methods=["POST"])
-post_router.add_api_route("/rate", endpoint=pv.unrate_post, methods=["DELETE"])
+post_router.add_api_route(
+    path="/rate", endpoint=pv.unrate_post, methods=["DELETE"],
+    response_model=BaseResponse
+)

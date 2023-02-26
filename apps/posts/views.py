@@ -71,12 +71,12 @@ async def rate_post(
 
 
 async def unrate_post(
-        post: PostBase, user=Depends(get_user),
+        post_id: int = Query(..., ge=1), user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    await hls.is_rate_owner(session, user.id, post.id)
-    await db_h.delete_rate(session, user.id, post.id)
-    return {"status": "Success", "msg": 'The rate was deleted successfully'}
+    await hls.is_rate_owner(session, user.id, post_id)
+    await db_h.delete_rate(session, user.id, post_id)
+    return {'detail': 'The rate was deleted successfully'}
 
 
 async def search_post(

@@ -1,4 +1,4 @@
-from sqlalchemy import insert, select, delete, update, text, func
+from sqlalchemy import insert, select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.main_helpers import model_to_dict, models_to_dict
@@ -103,10 +103,10 @@ async def create_rate(
 async def delete_rate(session: AsyncSession, user_id: int, post_id: int):
     stmt = delete(Rates).where(
         Rates.user_id == user_id, Rates.post_id == post_id
-    )
+    ).returning(Rates)
     rate = await session.execute(stmt)
     rate = rate.scalars().first()
-    if not rate:
+    if rate:
         return rate
 
 

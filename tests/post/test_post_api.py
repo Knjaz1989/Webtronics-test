@@ -205,9 +205,33 @@ class TestPostApi:
                 rate = rate.scalars().first()
                 assert rate.like is not rate.dislike
 
+    @pytest.mark.parametrize(
+        'params,code',
+        [
+            ({}, 422),
+            ({'post_id': 0}, 422),
+            ({'post_id': 1}, 403),
+            ({'post_id': 31}, 200),
+            ({'post_id': 31}, 403),
+        ]
+    )
+    async def test_unrate_post(self, async_client, main_token, params, code):
+        response = await async_client.delete(
+            f'{self.prefix}/rate',
+            headers={'Authorization': f'Bearer {main_token}'},
+            params=params
+        )
+        resp = response.json()
+        st_code = response.status_code
 
-    # async def test_unrate_post(self):
-    #     pass
-    #
+        assert st_code == code
+        if st_code == 200:
+            async with async_test_session() as session:
+                rate = await session.execute(
+                    select(Rates)
+                )
+                rates = rate.scalars().all()
+                assert len(rates) == 0
+
     # async def test_delete_post(self):
     #     pass
