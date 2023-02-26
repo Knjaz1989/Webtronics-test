@@ -13,6 +13,7 @@ async def is_post_owner(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This is not your post",
         )
+    return post
 
 
 async def is_not_post_owner(

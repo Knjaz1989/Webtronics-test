@@ -233,5 +233,22 @@ class TestPostApi:
                 rates = rate.scalars().all()
                 assert len(rates) == 0
 
-    # async def test_delete_post(self):
-    #     pass
+    @pytest.mark.parametrize(
+        'params,code',
+        [
+            ({}, 422),
+            ({'post_id': 0}, 422),
+            ({'post_id': 1}, 200),
+            ({'post_id': 31}, 403),
+        ]
+    )
+    async def test_delete_post(self, async_client, main_token, params, code):
+        response = await async_client.delete(
+            f'{self.prefix}/',
+            headers={'Authorization': f'Bearer {main_token}'},
+            params=params
+        )
+        resp = response.json()
+        st_code = response.status_code
+
+        assert st_code == code

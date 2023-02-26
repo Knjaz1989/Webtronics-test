@@ -40,12 +40,12 @@ async def get_current_post(
 
 
 async def delete_post(
-        post_data: PostBase, user=Depends(get_user),
+        post_id: int = Query(..., ge=1), user=Depends(get_user),
         session=Depends(get_async_session)
 ):
-    await hls.is_post_owner(session, user.id, post_data.id)
-    await db_h.delete_post(session, user.id, post_data.id)
-    return {"status": "Success", "msg": 'The post was deleted successfully'}
+    await hls.is_post_owner(session, user.id, post_id)
+    post = await db_h.delete_post(session, user.id, post_id)
+    return {"detail": 'The post was deleted successfully', 'data': post}
 
 
 async def change_post(

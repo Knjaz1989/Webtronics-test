@@ -15,7 +15,10 @@ post_router.add_api_route(
     path="/", endpoint=pv.add_post, methods=["POST"],
     response_model=PostAddGetResponse, status_code=status.HTTP_201_CREATED
 )
-post_router.add_api_route("/", endpoint=pv.delete_post, methods=["DELETE"])
+post_router.add_api_route(
+    path="/", endpoint=pv.delete_post, methods=["DELETE"],
+    response_model=PostAddGetResponse
+)
 post_router.add_api_route("/", endpoint=pv.change_post, methods=["PATCH"])
 
 post_router.add_api_route(

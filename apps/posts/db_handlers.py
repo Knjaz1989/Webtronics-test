@@ -32,7 +32,7 @@ async def delete_post(
     """Delete post from the database"""
     stmt = delete(Post).where(
         Post.id == post_id, Post.user_id == user_id
-    ).returning(Post.id)
+    ).returning(Post)
     post = await session.execute(stmt)
     post = post.scalars().first()
     if post:
