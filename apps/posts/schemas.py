@@ -22,6 +22,9 @@ class PostDataResponse(BaseModel):
     class Config:
         # Don't show extra fields
         extra = Extra.ignore
+        # Can convert a database model to a pydantic model using 'from_orm'
+        # method
+        orm_mode = True
 
 
 class BaseResponse(BaseModel):

@@ -10,7 +10,7 @@ async def is_post_owner(
     post = await db_h.get_own_post(session, user_id, post_id)
     if not post:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="This is not your post",
         )
 

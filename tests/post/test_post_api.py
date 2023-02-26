@@ -1,5 +1,8 @@
 import pytest
 
+from apps.posts.db_handlers import get_post
+from tests.conftest import async_test_session
+
 main_user_posts_data = {
     number: (
         {
@@ -47,7 +50,8 @@ class TestPostApi:
 
     @pytest.mark.parametrize('json,code', testdata)
     async def test_add_second_user_posts(
-            self, async_client, second_token, json, code):
+            self, async_client, second_token, json, code
+    ):
         response = await async_client.post(
             f'{self.prefix}/',
             headers={'Authorization': f'Bearer {second_token}'},
@@ -83,36 +87,50 @@ class TestPostApi:
 
     @pytest.mark.parametrize('params,count,code', testdata)
     async def test_get_all_posts(
-            self, async_client, main_token, params, count, code):
+            self, async_client, main_token, params, count, code
+    ):
         response = await async_client.get(
             f'{self.prefix}/all',
             headers={'Authorization': f'Bearer {main_token}'},
             params=params
         )
         resp = response.json()
+
         assert response.status_code == code
         assert isinstance(resp, dict) is True
         if response.status_code == 200:
             assert len(resp.get('data')) == count
 
+    @pytest.mark.parametrize(
+        'json, code',
+        [
+            ({'post_id': 1, 'title': 'Not new title'}, 200),
+            ({'post_id': 2, 'content': 'Not new content'}, 200),
+            ({
+                 'post_id': 3, 'title': 'change title',
+                 'content': 'Change content'
+             }, 200),
+            ({'post_id': 31, 'title': 'Other title'}, 403),
+            ({'post_id': 32, 'content': 'Other content'}, 403),
+            ({'post_id': 4}, 422),
+        ]
+    )
+    async def test_change_post(self, async_client, main_token, json, code):
+        response = await async_client.patch(
+            f'{self.prefix}/',
+            headers={'Authorization': f'Bearer {main_token}'},
+            json=json
+        )
 
-    # testdata = [
-    #     ({'post_id': 1, 'title': 'Not new title'}, 200),
-    #     ({'post_id': 1, 'content': 'Not new content'}, 200),
-    #     ({'post_id': 1, 'title': 'Second changes',
-    #       'content': 'Second my content'}, 422),
-    #     ({'post_id': 1}, 422),
-    # ]
-    #
-    # @pytest.mark.parametrize('json, code', testdata)
-    # async def test_change_post(self, async_client, token, json, code):
-    #     response = await async_client.patch(
-    #         f'{self.prefix}/',
-    #         headers={'Authorization': f'Bearer {token}'},
-    #         json=json
-    #     )
-    #     pass
-    #
+        status_code = response.status_code
+        assert status_code == code
+        if status_code == 200:
+            async with async_test_session() as session:
+                post = await get_post(session, json['post_id'])
+                del json['post_id']
+                for key, value in json.items():
+                    assert post.get(key) == value
+
     # async def test_search_posts(self):
     #     pass
     #
