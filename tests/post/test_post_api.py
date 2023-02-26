@@ -1,6 +1,8 @@
 import pytest
+from sqlalchemy import select
 
-from apps.posts.db_handlers import get_post
+from apps.posts.db_handlers import get_post, get_own_rate
+from database.models import Rates
 from tests.conftest import async_test_session
 
 main_user_posts_data = {
@@ -170,9 +172,40 @@ class TestPostApi:
         if st_code == 200:
             assert len(resp['data']) == count
 
-    # async def test_rate_post(self):
-    #     pass
-    #
+    @pytest.mark.parametrize(
+        'json,code',
+        [
+            ({}, 422),
+            ({'post_id': 1}, 422),
+            ({'post_id': 1, 'action': 'go'}, 422),
+            ({'post_id': 1, 'action': 'like'}, 403),
+            ({'post_id': 31, 'action': 'like'}, 200),
+            ({'post_id': 31, 'action': 'like'}, 400),
+            ({'post_id': 31, 'action': 'dislike'}, 200),
+        ]
+    )
+    async def test_rate_post(self, async_client, main_token, json, code):
+        response = await async_client.post(
+            f'{self.prefix}/rate',
+            headers={'Authorization': f'Bearer {main_token}'},
+            json=json
+        )
+        resp = response.json()
+        st_code = response.status_code
+
+        assert st_code == code
+        if st_code == 200:
+            async with async_test_session() as session:
+                rate = await session.execute(
+                    select(Rates).where(
+                        Rates.post_id == json['post_id'],
+                        Rates.user_id == 1
+                    )
+                )
+                rate = rate.scalars().first()
+                assert rate.like is not rate.dislike
+
+
     # async def test_unrate_post(self):
     #     pass
     #
