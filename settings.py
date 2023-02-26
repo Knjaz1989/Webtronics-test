@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic import BaseSettings, Field
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -23,6 +23,10 @@ class Config(BaseSettings):
 
     TOKEN_EXPIRE_MINUTES: int = 60
     ALGORITHM: str = 'HS256'
+
+    POSTS_LIMIT: int = 15
+    POSTS_LIMIT_MAX: int = Field(30, ge=POSTS_LIMIT)
+    POSTS_LIMIT_MIN: int = Field(1, ge=1, le=POSTS_LIMIT)
 
     class Config:
         env_file = '.env'

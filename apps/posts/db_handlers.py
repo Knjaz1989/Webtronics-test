@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.main_helpers import model_to_dict, models_to_dict
 from database.models import Post, Rates
+from settings import config
 
 
 async def create_post(
@@ -58,7 +59,8 @@ async def get_post(session: AsyncSession, post_id: int):
         return model_to_dict(post)
 
 
-async def get_posts(session: AsyncSession, limit: int, page: int):
+async def get_posts(
+        session: AsyncSession, page: int, limit: int = config.POSTS_LIMIT):
     """Get all posts from the database"""
     stmt = select(Post).offset(page * limit - limit).limit(limit)
     posts = await session.execute(stmt)
@@ -68,9 +70,8 @@ async def get_posts(session: AsyncSession, limit: int, page: int):
 
 
 async def search_posts(
-        session: AsyncSession, limit: int, page: int, title: str = None,
-        content: str = None,
-
+        session: AsyncSession, page: int, limit: int = config.POSTS_LIMIT,
+        title: str = None, content: str = None,
 ):
     """Search posts from the database"""
     if not title:
