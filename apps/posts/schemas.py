@@ -1,4 +1,5 @@
 from enum import Enum
+from fastapi import HTTPException, status
 from typing import List
 
 from pydantic import BaseModel, Field, root_validator, Extra
@@ -50,14 +51,17 @@ class PostRate(PostBase):
 
 
 class PostSearch(BaseModel):
-    title: str = Field(None, min_length=1)
-    content: str = Field(None, min_length=1)
+    title: str
+    content: str
+    limit: int
+    page: int
 
     @root_validator()
     def check_fields(cls, values):
         if not values.get('title') and not values.get('content'):
-            raise ValueError(
-                "Expected two fields or one of 'title' or 'context'")
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Expected two fields or one of 'title' or 'context'")
         return values
 
 

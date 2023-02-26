@@ -1,4 +1,4 @@
-from sqlalchemy import insert, select, delete, update, text
+from sqlalchemy import insert, select, delete, update, text, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.main_helpers import model_to_dict, models_to_dict
@@ -68,29 +68,25 @@ async def get_posts(session: AsyncSession, limit: int, page: int):
 
 
 async def search_posts(
-        session: AsyncSession, title: str = None, content: str = None
+        session: AsyncSession, limit: int, page: int, title: str = None,
+        content: str = None,
 
 ):
     """Search posts from the database"""
-    select_list = []
-    values = {'title': title, 'content': content}
-    new_values = {}
-    for key, value in values.items():
-        if value:
-            select_list.append(
-                f"STRING_TO_ARRAY(LOWER({key}), ' ') && ARRAY[:{key}]"
-            )
-            new_values[key] = value
-    stmt = text(f"""
-        SELECT id, title, content FROM posts WHERE {' AND '.join(select_list)};
-        """)
-    # stmt = select(Post.id, Post.title, Post.content).\
-    #     where(text(f"{' AND '.join(select_list)}"))
-    posts = await session.execute(stmt, params=new_values)
-    keys = posts.keys()
-    posts = posts.all()
-    posts = [dict(zip(keys, item)) for item in posts]
-    return posts
+    if not title:
+        title = '%'
+    else:
+        title = '%' + title + '%'
+    if not content:
+        content = '%'
+    else:
+        content = '%' + content + '%'
+    stmt = select(Post).\
+        where(Post.title.ilike(title), Post.content.ilike(content)).\
+        offset(page * limit + 1 - limit).limit(limit)
+    posts = await session.execute(stmt)
+    posts = posts.scalars().all()
+    return models_to_dict(posts)
 
 
 async def create_rate(

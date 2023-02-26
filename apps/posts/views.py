@@ -1,4 +1,4 @@
-from fastapi import Depends, Query, HTTPException, status
+from fastapi import Depends, Query, HTTPException, status, Body
 
 from database.db_async import get_async_session
 from . import helpers as hls, db_handlers as db_h
@@ -80,10 +80,18 @@ async def unrate_post(
 
 
 async def search_post(
-        post_data: PostSearch, user: dict = Depends(get_user),
+        title: str = Query(None, min_length=1),
+        content: str = Query(None, min_length=1),
+        limit: int = Query(15, ge=1, le=30),
+        page: int = Query(1, ge=1),
+        user: dict = Depends(get_user),
         session=Depends(get_async_session)
 ):
-    posts = await db_h.search_posts(
-        session, post_data.title, post_data.content
+    post_data = PostSearch(
+        title=title, content=content, limit=limit, page=page
     )
-    return {'status': 'Success', 'data': posts}
+    posts = await db_h.search_posts(
+        session, post_data.limit, post_data.page, post_data.title,
+        post_data.content
+    )
+    return {'detail': 'Success', 'data': posts}

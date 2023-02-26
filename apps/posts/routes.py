@@ -22,7 +22,10 @@ post_router.add_api_route(
     path="/all", endpoint=pv.get_all_posts, methods=["GET"],
     response_model=PostGetAllResponse
 )
-post_router.add_api_route("/search", endpoint=pv.search_post, methods=["GET"])
+post_router.add_api_route(
+    path="/search", endpoint=pv.search_post, methods=["GET"],
+    response_model=PostGetAllResponse
+)
 
 post_router.add_api_route("/rate", endpoint=pv.rate_post, methods=["POST"])
 post_router.add_api_route("/rate", endpoint=pv.unrate_post, methods=["DELETE"])
