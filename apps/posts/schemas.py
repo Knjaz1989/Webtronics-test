@@ -51,10 +51,10 @@ class PostRate(PostBase):
 
 
 class PostSearch(BaseModel):
-    title: str
-    content: str
-    limit: int
-    page: int
+    title: str = Field(None, min_length=1)
+    content: str = Field(None, min_length=1)
+    limit: int = Field(15, ge=1, le=30)
+    page: int = Field(1, ge=1)
 
     @root_validator()
     def check_fields(cls, values):
@@ -65,6 +65,15 @@ class PostSearch(BaseModel):
         return values
 
 
-class PostUpdate(PostBase, PostSearch):
-    """Inherit 'id' field from PostBase.
-    Inherit 'title' and 'content' fields and validation from PostSearch"""
+class PostUpdate(BaseModel):
+    id: int = Field(..., ge=1, alias="post_id")
+    title: str = Field(None, min_length=1)
+    content: str = Field(None, min_length=1)
+
+    @root_validator()
+    def check_fields(cls, values):
+        if not values.get('title') and not values.get('content'):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Expected two fields or one of 'title' or 'context'")
+        return values

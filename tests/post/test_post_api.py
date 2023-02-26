@@ -15,7 +15,12 @@ main_user_posts_data = {
 second_user_posts_data = {
     31: ({'title': 'New post 31', 'content': 'How to get data'}, 201),
     32: ({'title': 'New post 32', 'content': 'Places in the Ney York'}, 201),
-    33: ({'title': 'New post 33', 'content': 'Winter in London'}, 201),
+    33: (
+        {
+            'title': 'Winter in London',
+            'content': 'I went to the London in winter'
+        }, 201
+    ),
 }
 
 
@@ -131,9 +136,40 @@ class TestPostApi:
                 for key, value in json.items():
                     assert post.get(key) == value
 
-    # async def test_search_posts(self):
-    #     pass
-    #
+    @pytest.mark.parametrize(
+        'params,count,code',
+        [
+            ({}, 0, 422),
+            ({'content': ''}, 0, 422),
+            ({'title': ''}, 0, 422),
+            ({'title': 'New'}, 15, 200),
+            ({'title': 'new'}, 15, 200),
+            ({'title': 'new', 'limit': 30}, 30, 200),
+            ({'title': 'winter'}, 1, 200),
+            ({'content': 'In'}, 2, 200),
+            ({'content': 'in'}, 2, 200),
+            ({'title': 'new', 'limit': 0}, 0, 422),
+            ({'title': 'new', 'limit': 10}, 10, 200),
+            ({'title': 'new', 'limit': 31}, 0, 422),
+            ({'title': 'new', 'limit': 10, 'page': 0}, 0, 422),
+            ({'title': 'new', 'limit': 10, 'page': 10}, 0, 200),
+        ]
+    )
+    async def test_search_posts(
+            self, async_client, main_token, params, count, code
+    ):
+        response = await async_client.get(
+            f'{self.prefix}/search',
+            headers={'Authorization': f'Bearer {main_token}'},
+            params=params
+        )
+        st_code = response.status_code
+        resp = response.json()
+
+        assert st_code == code
+        if st_code == 200:
+            assert len(resp['data']) == count
+
     # async def test_rate_post(self):
     #     pass
     #

@@ -78,7 +78,7 @@ async def second_token(async_client):
     )
     response_2 = await async_client.post(
         "/user/login",
-        json={'email': 'knjaz1989@uandex.com', 'password': '12345678'}
+        json={'email': 'knjaz1989@yandex.com', 'password': '12345678'}
     )
     token = response_2.json().get('access_token')
     return token

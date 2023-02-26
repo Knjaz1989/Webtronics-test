@@ -60,7 +60,7 @@ async def get_post(session: AsyncSession, post_id: int):
 
 async def get_posts(session: AsyncSession, limit: int, page: int):
     """Get all posts from the database"""
-    stmt = select(Post).offset(page * limit + 1 - limit).limit(limit)
+    stmt = select(Post).offset(page * limit - limit).limit(limit)
     posts = await session.execute(stmt)
     posts = posts.scalars().all()
     posts = models_to_dict(posts)
@@ -83,7 +83,7 @@ async def search_posts(
         content = '%' + content + '%'
     stmt = select(Post).\
         where(Post.title.ilike(title), Post.content.ilike(content)).\
-        offset(page * limit + 1 - limit).limit(limit)
+        offset(page * limit - limit).limit(limit)
     posts = await session.execute(stmt)
     posts = posts.scalars().all()
     return models_to_dict(posts)
