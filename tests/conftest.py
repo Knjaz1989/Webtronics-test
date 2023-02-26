@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession,\
     async_sessionmaker
 import pytest
 
+from apps.posts.db_handlers import get_posts
 from apps.server import app
 from database.db_async import get_async_session
 from database.models import Base
@@ -82,3 +83,9 @@ async def second_token(async_client):
     )
     token = response_2.json().get('access_token')
     return token
+
+
+async def get_posts_count():
+    async with async_test_session() as session:
+        posts = await get_posts(session, page=1, limit=1000)
+        return len(posts)

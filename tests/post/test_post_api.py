@@ -1,9 +1,10 @@
 import pytest
 from sqlalchemy import select
 
-from apps.posts.db_handlers import get_post, get_own_rate
+from apps.posts.db_handlers import get_post
 from database.models import Rates
-from tests.conftest import async_test_session
+from settings import config
+from tests.conftest import async_test_session, get_posts_count
 
 main_user_posts_data = {
     number: (
@@ -29,16 +30,20 @@ second_user_posts_data = {
 class TestPostApi:
     prefix = '/post'
 
-    testdata = [
-        ({'title': 'new_title'}, 422),
-        ({'content': 'new_content'}, 422),
-        ({'title': '', 'content': 'new_content'}, 422),
-        ({'title': 'new_title', 'content': ''}, 422),
-        *main_user_posts_data.values()
-    ]
-
-    @pytest.mark.parametrize('json,code', testdata)
-    async def test_add_post(self, async_client, main_token, json, code):
+    @pytest.mark.parametrize(
+        'json,code',
+        [
+            ({'title': 'new_title'}, 422),
+            ({'content': 'new_content'}, 422),
+            ({'title': '', 'content': 'new_content'}, 422),
+            ({'title': 'new_title', 'content': ''}, 422),
+            *main_user_posts_data.values()
+        ]
+    )
+    async def test_add_main_user_post(
+            self, async_client, main_token, json, code
+    ):
+        start_count = await get_posts_count()
         response = await async_client.post(
             f'{self.prefix}/',
             headers={'Authorization': f'Bearer {main_token}'},
@@ -49,29 +54,38 @@ class TestPostApi:
         assert isinstance(response.json(), dict) is True
         if response.status_code == 201:
             resp = response.json()
+            end_count = await get_posts_count()
             assert len(resp.get('data', {})) == 3
+            assert end_count == start_count + 1
 
-    testdata = [
-        *second_user_posts_data.values()
-    ]
-
-    @pytest.mark.parametrize('json,code', testdata)
+    @pytest.mark.parametrize(
+        'json,code',
+        [
+            *second_user_posts_data.values()
+        ]
+    )
     async def test_add_second_user_posts(
             self, async_client, second_token, json, code
     ):
+        start_count = await get_posts_count()
         response = await async_client.post(
             f'{self.prefix}/',
             headers={'Authorization': f'Bearer {second_token}'},
             json=json
         )
 
-    testdata = [
-        ({}, 422),
-        ({'post_id': 0}, 422),
-        *[({'post_id': key}, 200) for key in main_user_posts_data.keys()]
-    ]
+        assert response.status_code == code
+        end_count = await get_posts_count()
+        assert end_count == start_count + 1
 
-    @pytest.mark.parametrize('params,code', testdata)
+    @pytest.mark.parametrize(
+        'params,code',
+        [
+            ({}, 422),
+            ({'post_id': 0}, 422),
+            *[({'post_id': key}, 200) for key in main_user_posts_data.keys()]
+        ]
+    )
     async def test_get_post(self, async_client, main_token, params, code):
         response = await async_client.get(
             f'{self.prefix}/',
@@ -82,17 +96,18 @@ class TestPostApi:
         assert response.status_code == code
         assert isinstance(response.json(), dict) is True
 
-    testdata = [
-        ({'limit': 0}, 0, 422),
-        ({'limit': 31}, 0, 422),
-        ({'page': 0}, 0, 422),
-        ({}, 15, 200),
-        ({'limit': 10}, 10, 200),
-        ({'page': 200}, 0, 200),
-        ({'limit': 10, 'page': 2}, 10, 200),
-    ]
-
-    @pytest.mark.parametrize('params,count,code', testdata)
+    @pytest.mark.parametrize(
+        'params,count,code',
+        [
+            ({'limit': 0}, 0, 422),
+            ({'limit': 31}, 0, 422),
+            ({'page': 0}, 0, 422),
+            ({}, config.POSTS_LIMIT, 200),
+            ({'limit': 10}, 10, 200),
+            ({'page': 200}, 0, 200),
+            ({'limit': 10, 'page': 2}, 10, 200),
+        ]
+    )
     async def test_get_all_posts(
             self, async_client, main_token, params, count, code
     ):
@@ -128,10 +143,12 @@ class TestPostApi:
             headers={'Authorization': f'Bearer {main_token}'},
             json=json
         )
+        resp = response.json()
+        st_code = response.status_code
 
-        status_code = response.status_code
-        assert status_code == code
-        if status_code == 200:
+        assert st_code == code
+        assert isinstance(resp, dict) is True
+        if st_code == 200:
             async with async_test_session() as session:
                 post = await get_post(session, json['post_id'])
                 del json['post_id']
@@ -144,8 +161,8 @@ class TestPostApi:
             ({}, 0, 422),
             ({'content': ''}, 0, 422),
             ({'title': ''}, 0, 422),
-            ({'title': 'New'}, 15, 200),
-            ({'title': 'new'}, 15, 200),
+            ({'title': 'New'}, config.POSTS_LIMIT, 200),
+            ({'title': 'new'}, config.POSTS_LIMIT, 200),
             ({'title': 'new', 'limit': 30}, 30, 200),
             ({'title': 'winter'}, 1, 200),
             ({'content': 'In'}, 2, 200),
@@ -169,6 +186,7 @@ class TestPostApi:
         resp = response.json()
 
         assert st_code == code
+        assert isinstance(resp, dict) is True
         if st_code == 200:
             assert len(resp['data']) == count
 
@@ -194,6 +212,7 @@ class TestPostApi:
         st_code = response.status_code
 
         assert st_code == code
+        assert isinstance(resp, dict) is True
         if st_code == 200:
             async with async_test_session() as session:
                 rate = await session.execute(
@@ -225,6 +244,7 @@ class TestPostApi:
         st_code = response.status_code
 
         assert st_code == code
+        assert isinstance(resp, dict) is True
         if st_code == 200:
             async with async_test_session() as session:
                 rate = await session.execute(
@@ -243,6 +263,7 @@ class TestPostApi:
         ]
     )
     async def test_delete_post(self, async_client, main_token, params, code):
+        start_count = await get_posts_count()
         response = await async_client.delete(
             f'{self.prefix}/',
             headers={'Authorization': f'Bearer {main_token}'},
@@ -252,3 +273,7 @@ class TestPostApi:
         st_code = response.status_code
 
         assert st_code == code
+        assert isinstance(resp, dict) is True
+        if st_code == 200:
+            end_count = await get_posts_count()
+            assert end_count + 1 == start_count
