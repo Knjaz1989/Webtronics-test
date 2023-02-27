@@ -10,7 +10,7 @@ class User(Base):
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
     name = sa.Column(sa.String(40), nullable=False)
     hashed_password = sa.Column(sa.String(), nullable=False)
-    email = sa.Column(sa.String(50), unique=True, index=True)
+    email = sa.Column(sa.String(50), unique=True, index=True, nullable=False)
 
     def __str__(self):
         return f'{self.login}: {self.email}'

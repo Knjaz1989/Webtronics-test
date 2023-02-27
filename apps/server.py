@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.middleware.wsgi import WSGIMiddleware
+from a2wsgi import WSGIMiddleware
 
 from apps.admin.main import flask_app
 from apps.auth.routes import user_router

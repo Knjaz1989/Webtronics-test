@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
-import hashlib
 import requests
 
 from jose import jwt
 
+from apps.main_helpers import get_hash_password
 from settings import config
 
 
@@ -17,12 +17,6 @@ def create_token(data: dict) -> tuple:
         to_encode, config.SECRET, algorithm=config.ALGORITHM
     )
     return encoded_jwt, expire
-
-
-def get_hash_password(password: str) -> str:
-    """Hash password"""
-    hash_pass = hashlib.sha512(password.encode("utf-8")).hexdigest()
-    return hash_pass
 
 
 def validate_password(password: str, hashed_password: str):

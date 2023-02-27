@@ -1,3 +1,6 @@
+import hashlib
+
+
 def model_to_dict(model):
     new_dict = {}
     model_dict = model.__dict__
@@ -12,3 +15,9 @@ def models_to_dict(models: list):
     for model in models:
         new_list.append(model_to_dict(model))
     return new_list
+
+
+def get_hash_password(password: str) -> str:
+    """Hash password"""
+    hash_pass = hashlib.sha512(password.encode("utf-8")).hexdigest()
+    return hash_pass
