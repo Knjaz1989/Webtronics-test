@@ -13,7 +13,7 @@ class User(Base):
     email = sa.Column(sa.String(50), unique=True, index=True, nullable=False)
 
     def __str__(self):
-        return f'{self.login}: {self.email}'
+        return f'{self.name}: {self.email}'
 
 
 class Post(Base):
