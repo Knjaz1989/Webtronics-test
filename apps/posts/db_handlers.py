@@ -2,7 +2,7 @@ from sqlalchemy import insert, select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.main_helpers import model_to_dict, models_to_dict
-from database.models import Post, Rates
+from database.models import Post, Rate
 from settings import config
 
 
@@ -95,16 +95,16 @@ async def create_rate(
 ):
     values = {'like': False, 'dislike': False}
     values[rate] = True
-    stmt = insert(Rates).values(
+    stmt = insert(Rate).values(
         user_id=user_id, post_id=post_id, **values
     )
     await session.execute(stmt)
 
 
 async def delete_rate(session: AsyncSession, user_id: int, post_id: int):
-    stmt = delete(Rates).where(
-        Rates.user_id == user_id, Rates.post_id == post_id
-    ).returning(Rates)
+    stmt = delete(Rate).where(
+        Rate.user_id == user_id, Rate.post_id == post_id
+    ).returning(Rate)
     rate = await session.execute(stmt)
     rate = rate.scalars().first()
     if rate:
@@ -114,8 +114,8 @@ async def delete_rate(session: AsyncSession, user_id: int, post_id: int):
 async def get_own_rate(
         session: AsyncSession, user_id: int, post_id: int
 ):
-    stmt = select(Rates).where(
-        Rates.user_id == user_id, Rates.post_id == post_id
+    stmt = select(Rate).where(
+        Rate.user_id == user_id, Rate.post_id == post_id
     )
     rate = await session.execute(stmt)
     rate = rate.scalars().first()
@@ -131,7 +131,7 @@ async def update_rate(
         values['like'] = True
     else:
         values['dislike'] = True
-    stmt = update(Rates). \
-        where(Rates.post_id == post_id, Rates.user_id == user_id).\
+    stmt = update(Rate). \
+        where(Rate.post_id == post_id, Rate.user_id == user_id).\
         values(**values)
     await session.execute(stmt)

@@ -2,7 +2,7 @@ from flask import Flask
 from flask_admin import Admin
 
 from database.db_sync import db as db_sync, Session
-from database.models import User, Post
+from database.models import User, Post, Rate
 from settings import config
 from .views import UserModelView, PostModelView
 

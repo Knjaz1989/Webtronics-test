@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import select
 
 from apps.posts.db_handlers import get_post
-from database.models import Rates
+from database.models import Rate
 from settings import config
 from tests.conftest import async_test_session, get_posts_count
 
@@ -216,9 +216,9 @@ class TestPostApi:
         if st_code == 200:
             async with async_test_session() as session:
                 rate = await session.execute(
-                    select(Rates).where(
-                        Rates.post_id == json['post_id'],
-                        Rates.user_id == 1
+                    select(Rate).where(
+                        Rate.post_id == json['post_id'],
+                        Rate.user_id == 1
                     )
                 )
                 rate = rate.scalars().first()
@@ -248,7 +248,7 @@ class TestPostApi:
         if st_code == 200:
             async with async_test_session() as session:
                 rate = await session.execute(
-                    select(Rates)
+                    select(Rate)
                 )
                 rates = rate.scalars().all()
                 assert len(rates) == 0
