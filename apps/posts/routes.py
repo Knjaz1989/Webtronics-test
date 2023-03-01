@@ -4,7 +4,7 @@ from apps.posts import views as pv
 from apps.posts.schemas import PostAddGetResponse, PostGetAllResponse, \
     BaseResponse
 
-post_router = APIRouter(prefix="/post", tags=["post"])
+post_router = APIRouter(prefix="/post")
 
 
 post_router.add_api_route(

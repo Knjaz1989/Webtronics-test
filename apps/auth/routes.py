@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from .schemas import TokenResponse
 from .views import sign_up, login, delete_user
 
-user_router = APIRouter(prefix="/user", tags=["user"])
+user_router = APIRouter(prefix="/user")
 
 
 user_router.add_api_route("/sign-up", endpoint=sign_up, methods=['POST'])

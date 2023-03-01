@@ -1,4 +1,4 @@
-from sqlalchemy import insert, select, delete, update
+from sqlalchemy import insert, select, delete, update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.main_helpers import model_to_dict, models_to_dict
@@ -8,7 +8,7 @@ from settings import config
 
 async def create_post(
         session: AsyncSession, user_id: int, title: str, content: str,
-) -> None:
+) -> dict:
     """Add post into the database"""
     stmt = insert(Post).\
         values(title=title, content=content, user_id=user_id).\
@@ -19,8 +19,10 @@ async def create_post(
 
 
 async def get_own_post(
-        session: AsyncSession, user_id: int, post_id: int):
-    stmt = select(Post).where(Post.id == post_id, Post.user_id == user_id)
+        session: AsyncSession, user_id: int, post_id: int
+):
+    stmt = select(Post).where(
+        and_(Post.id == post_id, Post.user_id == user_id))
     post = await session.execute(stmt)
     post = post.scalars().first()
     if post:
@@ -32,7 +34,7 @@ async def delete_post(
 ):
     """Delete post from the database"""
     stmt = delete(Post).where(
-        Post.id == post_id, Post.user_id == user_id
+        and_(Post.id == post_id, Post.user_id == user_id)
     ).returning(Post)
     post = await session.execute(stmt)
     post = post.scalars().first()
@@ -45,14 +47,14 @@ async def change_post(session: AsyncSession, user_id: int, post_data: dict):
     post_id = post_data.pop('id')
     post_data = {key: value for key, value in post_data.items() if value}
     stmt = update(Post).where(
-        Post.id == post_id, Post.user_id == user_id
+        and_(Post.id == post_id, Post.user_id == user_id)
     ).values(**post_data)
     await session.execute(stmt)
 
 
 async def get_post(session: AsyncSession, post_id: int):
     """Get current post from the database"""
-    stmt = select(Post).where(Post.id == post_id)
+    stmt = select(Post).where(and_(Post.id == post_id))
     post = await session.execute(stmt)
     post = post.scalars().first()
     if post:
@@ -103,7 +105,7 @@ async def create_rate(
 
 async def delete_rate(session: AsyncSession, user_id: int, post_id: int):
     stmt = delete(Rate).where(
-        Rate.user_id == user_id, Rate.post_id == post_id
+        and_(Rate.user_id == user_id, Rate.post_id == post_id)
     ).returning(Rate)
     rate = await session.execute(stmt)
     rate = rate.scalars().first()
@@ -115,7 +117,7 @@ async def get_own_rate(
         session: AsyncSession, user_id: int, post_id: int
 ):
     stmt = select(Rate).where(
-        Rate.user_id == user_id, Rate.post_id == post_id
+        and_(Rate.user_id == user_id, Rate.post_id == post_id)
     )
     rate = await session.execute(stmt)
     rate = rate.scalars().first()
@@ -132,6 +134,6 @@ async def update_rate(
     else:
         values['dislike'] = True
     stmt = update(Rate). \
-        where(Rate.post_id == post_id, Rate.user_id == user_id).\
+        where(and_(Rate.post_id == post_id, Rate.user_id == user_id)).\
         values(**values)
     await session.execute(stmt)
