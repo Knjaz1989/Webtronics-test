@@ -23,7 +23,9 @@ class UserBase(BaseModel):
 class UserLogin(UserBase):
     """Log in request schema.
     Email and password inherits from parent"""
-    expire_minutes: int = Field(config.TOKEN_EXPIRE_MINUTES, ge=1)
+    expire_seconds: int = Field(
+        config.TOKEN_EXPIRE_SECONDS, ge=1, le=86400
+    )
 
 
 class UserCreate(UserBase):

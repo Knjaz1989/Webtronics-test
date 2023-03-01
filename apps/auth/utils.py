@@ -11,7 +11,7 @@ def create_token(data: dict) -> tuple:
     """Create token for user"""
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(
-        minutes=to_encode.get("expire_minutes")
+        seconds=to_encode.get("expire_seconds")
     )
     encoded_jwt = jwt.encode(
         to_encode, config.SECRET, algorithm=config.ALGORITHM

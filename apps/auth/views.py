@@ -42,6 +42,6 @@ async def login(
     await redis.set(
         name=user.email,
         value=get_hash_token(access_token),
-        ex=user.expire_minutes
+        ex=user.expire_seconds
     )
     return {"access_token": access_token, "expires": expires}

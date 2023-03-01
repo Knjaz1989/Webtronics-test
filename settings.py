@@ -21,7 +21,7 @@ class Config(BaseSettings):
     SECRET = 'SECRET'
     TEST_PASSWORD: str
 
-    TOKEN_EXPIRE_MINUTES: int = 60
+    TOKEN_EXPIRE_SECONDS: int = 3600
     ALGORITHM: str = 'HS256'
 
     POSTS_LIMIT: int = 15
