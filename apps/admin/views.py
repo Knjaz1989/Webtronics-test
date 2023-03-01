@@ -3,7 +3,6 @@ from flask_admin.contrib.sqla.filters import FilterLike, FilterEqual
 from wtforms.validators import DataRequired
 
 from apps.main_helpers import get_hash_password
-from database.models import Rate
 
 
 class UserModelView(ModelView):
@@ -23,21 +22,35 @@ class UserModelView(ModelView):
 
 class PostModelView(ModelView):
 
+    # Override for current filters
+    def scaffold_filters(self, name):
+        """
+            Generate filter object for the given name
+
+            :param name:
+                Name of the field
+        """
+        filter_list = [
+            FilterLike(name, name=self.column_labels.get(name, 'undefined')),
+            FilterEqual(name, name=self.column_labels.get(name, 'undefined')),
+        ]
+        return filter_list
+
     # Change name of columns
     column_labels = {
         'title': 'Заголовок', 'content': 'Содержание', 'user': 'Владелец',
         'user.name': 'Имя владельца', 'user.email': 'Почта владельца',
-        'like_count': 'Like', 'dislike_count': 'Dislike',
+        'like_count': 'Likes', 'dislike_count': 'Dislikes',
     }
     # Show current columns
     column_list = (
-        'title', 'content', 'user.name', 'user.email', 'like_count',
+        'id', 'title', 'content', 'user.name', 'user.email', 'like_count',
         'dislike_count',
     )
     # Can sort columns
     column_sortable_list = (
         'title', 'content', 'user.name', 'user.email', 'like_count',
-        'dislike_count'
+        'dislike_count',
     )
     # Search on title
     column_searchable_list = ('title',)
@@ -53,17 +66,3 @@ class PostModelView(ModelView):
     # can_create = False
     # Max rows on page
     page_size = 50
-
-    # Override for current filters
-    def scaffold_filters(self, name):
-        """
-            Generate filter object for the given name
-
-            :param name:
-                Name of the field
-        """
-        filter_list = [
-            FilterLike(name, name=self.column_labels.get(name, 'undefined')),
-            FilterEqual(name, name=self.column_labels.get(name, 'undefined')),
-        ]
-        return filter_list
