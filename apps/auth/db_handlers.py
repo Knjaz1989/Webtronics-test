@@ -1,4 +1,4 @@
-from sqlalchemy import select, insert, delete
+from sqlalchemy import select, insert, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
@@ -14,15 +14,15 @@ async def create_user(
     await session.execute(stmt)
 
 
-async def delete_user(user_id: int, session: AsyncSession) -> None:
+async def delete_user(session: AsyncSession, user_id: int) -> None:
     """Delete user from the database"""
-    stmt = delete(User).where(User.id == user_id)
+    stmt = delete(User).where(and_(User.id == user_id))
     await session.execute(stmt)
 
 
 async def get_user_by_email(session: AsyncSession, email: str):
     """Get user from the database by email"""
-    stmt = select(User).where(User.email == email)
+    stmt = select(User).where(and_(User.email == email))
     print(stmt)
     user_db = await session.execute(stmt)
     user_db = user_db.scalars().first()

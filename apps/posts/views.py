@@ -3,8 +3,8 @@ from fastapi import Depends, Query, HTTPException, status
 from settings import config
 from database.db_async import get_async_session
 from . import helpers as hls, db_handlers as db_h
-from .dependencies import get_user
-from .schemas import PostBase, PostAdd, PostUpdate, PostRate, PostSearch
+from apps.main_dependencies import get_user
+from .schemas import PostAdd, PostUpdate, PostRate, PostSearch
 
 
 async def add_post(

@@ -6,7 +6,7 @@ import aioredis
 async def get_redis():
     redis = await aioredis.from_url('redis://localhost/0')
     yield redis
-    redis.close()
+    await redis.close()
 
 
 def get_hash_token(token: str) -> str:

@@ -13,6 +13,7 @@ def create_token(data: dict) -> tuple:
     expire = datetime.utcnow() + timedelta(
         seconds=to_encode.get("expire_seconds")
     )
+    to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode, config.SECRET, algorithm=config.ALGORITHM
     )
