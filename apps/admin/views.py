@@ -15,7 +15,7 @@ class UserModelView(ModelView):
     # Don't show user password in Admin panel
     column_exclude_list = ['hashed_password', ]
     # Allow or forbid to create user
-    # can_create = False
+    can_create = False
     # Max rows on page
     page_size = 50
 
@@ -49,7 +49,7 @@ class PostModelView(ModelView):
     )
     # Can sort columns
     column_sortable_list = (
-        'title', 'content', 'user.name', 'user.email', 'like_count',
+        'id', 'title', 'content', 'user.name', 'user.email', 'like_count',
         'dislike_count',
     )
     # Search on title
@@ -63,6 +63,6 @@ class PostModelView(ModelView):
         'user': dict(validators=[DataRequired()]),
     }
     # Allow or forbid to create post
-    # can_create = False
+    can_create = False
     # Max rows on page
     page_size = 50
