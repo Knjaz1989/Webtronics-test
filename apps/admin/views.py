@@ -1,16 +1,22 @@
+from flask import redirect, url_for
+from flask_admin import AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.sqla.filters import FilterLike, FilterEqual
+from flask_login import current_user
 from wtforms.validators import DataRequired
 
 from apps.main_helpers import get_hash_password
 
 
-class UserModelView(ModelView):
+class DashboardView(AdminIndexView):
+    def is_accessible(self):
+        return current_user.is_authenticated
 
-    # Change getting password to hash
-    def on_model_change(self, form, model, is_created):
-        model.hashed_password = get_hash_password(model.hashed_password)
-        model.email = model.email.lower()
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+
+
+class UserModelView(ModelView):
 
     # Don't show user password in Admin panel
     column_exclude_list = ['hashed_password', ]
@@ -19,22 +25,19 @@ class UserModelView(ModelView):
     # Max rows on page
     page_size = 50
 
+    # Change getting password to hash
+    def on_model_change(self, form, model, is_created):
+        model.hashed_password = get_hash_password(model.hashed_password)
+        model.email = model.email.lower()
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+
 
 class PostModelView(ModelView):
-
-    # Override for current filters
-    def scaffold_filters(self, name):
-        """
-            Generate filter object for the given name
-
-            :param name:
-                Name of the field
-        """
-        filter_list = [
-            FilterLike(name, name=self.column_labels.get(name, 'undefined')),
-            FilterEqual(name, name=self.column_labels.get(name, 'undefined')),
-        ]
-        return filter_list
 
     # Change name of columns
     column_labels = {
@@ -66,3 +69,23 @@ class PostModelView(ModelView):
     can_create = False
     # Max rows on page
     page_size = 50
+
+    # Override for current filters
+    def scaffold_filters(self, name):
+        """
+            Generate filter object for the given name
+
+            :param name:
+                Name of the field
+        """
+        filter_list = [
+            FilterLike(name, name=self.column_labels.get(name, 'undefined')),
+            FilterEqual(name, name=self.column_labels.get(name, 'undefined')),
+        ]
+        return filter_list
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))

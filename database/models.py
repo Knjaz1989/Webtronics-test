@@ -1,7 +1,10 @@
+from hashlib import sha512
+
 import sqlalchemy as sa
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from database.db_sync import Session
 
 Base = declarative_base()
 
@@ -20,6 +23,31 @@ class User(Base):
 
     def __str__(self):
         return f'{self.name}: {self.email}'
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+    @classmethod
+    def sha512_password(cls, password: str) -> str:
+        return sha512(password.encode('utf-8')).hexdigest()
+
+    @classmethod
+    def check_user(cls, email: str, password: str) -> 'User':
+        with Session() as session:
+            user = session.query(User).filter(
+                User.email == email,
+                User.hashed_password == cls.sha512_password(password)
+            ).first()
+            return user
 
 
 class Post(Base):

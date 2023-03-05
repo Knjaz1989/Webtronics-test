@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    {% include 'login.css' %}
+  </style>
+</head>
+<body>
+<div class="login__box">
+  <header class="login__title">Authorization</header>
+  <div class="flash-message">
+    {% for message in get_flashed_messages(category_filter='login_message') %}
+      {{ message }}
+    {% endfor %}
+  </div>
+  <form action="/admin/login" method="post">
+    <label>
+      <span class="input__title">Email</span>
+      <input class="input__field" type="text" name="email" placeholder="example@gmail.com" required>
+    </label>
+    <label>
+      <span class="input__title">Password</span>
+      <input class="input__field" type="password" name="password" required>
+    </label>
+    <button class="login-form__button" type="submit">Log in</button>
+  </form>
+</div>
+</body>
+</html>
