@@ -19,7 +19,7 @@ async def get_user(
 ):
     user = decode_token(token)
     hash = await redis.get(user.get('email'))
-    if not hash or hash != get_hash_token(token):
+    if not hash or hash.decode('utf-8') != get_hash_token(token):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Your token has been expired",

@@ -13,6 +13,9 @@ class User(Base):
     name = sa.Column(sa.String(40), nullable=False)
     hashed_password = sa.Column(sa.String(), nullable=False)
     email = sa.Column(sa.String(50), unique=True, index=True, nullable=False)
+    is_admin = sa.Column(
+        sa.Boolean, server_default=sa.text('false'), nullable=False
+    )
     rates = relationship("Rate", backref="user", uselist=True)
 
     def __str__(self):
@@ -41,7 +44,9 @@ class Post(Base):
     @like_count.inplace.expression
     def like_count(cls):
         return sa.select(sa.func.count()).select_from(Rate).\
-            where(Rate.post_id == cls.id, Rate.like == True)
+            where(sa.and_(
+            Rate.post_id == cls.id, Rate.like == True
+        ))
 
     @hybrid_property
     def dislike_count(self) -> int:
@@ -50,7 +55,9 @@ class Post(Base):
     @dislike_count.inplace.expression
     def dislike_count(cls):
         return sa.select(sa.func.count()).select_from(Rate).\
-            where(Rate.post_id == cls.id, Rate.dislike == True)
+            where(sa.and_(
+            Rate.post_id == cls.id, Rate.dislike == True
+        ))
 
 
 class Rate(Base):
