@@ -5,7 +5,7 @@ from tests.conftest import async_test_session
 
 
 class TestAuth:
-    prefix = '/user'
+    prefix = '/api/user'
     email_real = 'knjaz1989@gmail.com'
     password_real = '12345678'
     email_test = '1@1.ru'

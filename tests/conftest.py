@@ -54,14 +54,14 @@ async def async_client():
 @pytest.fixture(scope='class')
 async def main_token(async_client):
     response_1 = await async_client.post(
-        "/user/sign-up",
+        "/api/user/sign-up",
         json={
             'name': 'Igor', 'email': 'knjaz1989@gmail.com',
             'password': '12345678'
         }
     )
     response_2 = await async_client.post(
-        "/user/login",
+        "/api/user/login",
         json={'email': 'knjaz1989@gmail.com', 'password': '12345678'}
     )
     token = response_2.json().get('access_token')
@@ -71,14 +71,14 @@ async def main_token(async_client):
 @pytest.fixture(scope='class')
 async def second_token(async_client):
     response_1 = await async_client.post(
-        "/user/sign-up",
+        "/api/user/sign-up",
         json={
             'name': 'Vasya', 'email': 'knjaz1989@yandex.com',
             'password': '12345678'
         }
     )
     response_2 = await async_client.post(
-        "/user/login",
+        "/api/user/login",
         json={'email': 'knjaz1989@yandex.com', 'password': '12345678'}
     )
     token = response_2.json().get('access_token')

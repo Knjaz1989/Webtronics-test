@@ -28,7 +28,7 @@ second_user_posts_data = {
 
 
 class TestPostApi:
-    prefix = '/post'
+    prefix = '/api/post'
 
     @pytest.mark.parametrize(
         'json,code',
