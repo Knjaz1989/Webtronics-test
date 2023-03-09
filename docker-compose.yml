@@ -42,8 +42,6 @@ services:
     container_name: site
     env_file:
       - .env
-    ports:
-      - '8000:8000'
     depends_on:
       - db
       - dbtest
@@ -52,9 +50,14 @@ services:
       - web-net
 
   nginx:
+    container_name: nginx
+    build: nginx
     ports:
       - '80:80'
       - '443:443'
     depends_on:
       - site
+    restart: always
+    networks:
+      - web-net
 
