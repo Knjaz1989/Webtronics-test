@@ -7,7 +7,7 @@ from database.models import User
 
 class Login(MethodView):
     def get(self):
-        return render_template("login.html")
+        return render_template("templates/login.html")
 
     def post(self):
         user: User = User.check_user(

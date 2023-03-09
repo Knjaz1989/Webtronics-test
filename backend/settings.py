@@ -1,5 +1,7 @@
+from dotenv import load_dotenv
 from pydantic import BaseSettings, Field
 
+load_dotenv()
 
 class Config(BaseSettings):
     DEBUG_SERVER: bool = False
@@ -12,9 +14,10 @@ class Config(BaseSettings):
 
     SYNC_SQLALCHEMY_URL: str
     ASYNC_SQLALCHEMY_URL: str
-    TEST_DATABASE_URL: str = 'postgresql://test:test@localhost:5432/test'
-    TEST_ASYNC_SQLALCHEMY_URL = \
-        'postgresql+asyncpg://test:test@localhost:5432/test'
+    TEST_DATABASE_URL: str
+    TEST_ASYNC_SQLALCHEMY_URL: str
+
+    REDIS_URL: str
 
     HUNTER_API_KEY: str
 

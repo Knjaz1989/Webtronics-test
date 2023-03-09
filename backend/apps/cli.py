@@ -11,7 +11,7 @@ def site_group():
 @site_group.command()
 @click.option(
     '-h', '--host',
-    default='127.0.0.1',
+    default='0.0.0.0',
     help="IP address or local domain name to run server on")
 @click.option(
     '-p', '--port',

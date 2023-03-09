@@ -1,0 +1,60 @@
+version: "3.8"
+
+networks:
+  web-net:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:14-alpine3.17
+    container_name: db
+    env_file:
+      - db_main.env
+    ports:
+      - '5433:5432'
+    networks:
+      - web-net
+
+  dbtest:
+    image: postgres:14-alpine3.17
+    container_name: dbtest
+    env_file:
+      - db_test.env
+    ports:
+      - '5434:5432'
+    networks:
+      - web-net
+    depends_on:
+      - db
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - web-net
+
+  site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: site
+    env_file:
+      - .env
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+      - dbtest
+      - redis
+    networks:
+      - web-net
+
+  nginx:
+    ports:
+      - '80:80'
+      - '443:443'
+    depends_on:
+      - site
+

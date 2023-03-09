@@ -2,9 +2,11 @@ import hashlib
 
 import aioredis
 
+from settings import config
+
 
 async def get_redis():
-    redis = await aioredis.from_url('redis://localhost/0')
+    redis = await aioredis.from_url(config.REDIS_URL)
     yield redis
     await redis.close()
 

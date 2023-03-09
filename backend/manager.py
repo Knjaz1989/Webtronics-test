@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import click
 
-from apps.cli import site_group
 from apps.admin.cli import admin_group
+from apps.cli import site_group
 from database.cli import db_group
 
 
