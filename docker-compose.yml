@@ -8,10 +8,9 @@ services:
   db:
     image: postgres:14-alpine3.17
     container_name: db
+
     env_file:
       - db_main.env
-    ports:
-      - '5433:5432'
     networks:
       - web-net
 
@@ -20,8 +19,6 @@ services:
     container_name: dbtest
     env_file:
       - db_test.env
-    ports:
-      - '5434:5432'
     networks:
       - web-net
     depends_on:
