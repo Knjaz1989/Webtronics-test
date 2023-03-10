@@ -21,18 +21,8 @@ app.include_router(site_router)
 # Mount admin on flask
 app.mount('/admin', WSGIMiddleware(flask_app))
 
-app.mount(
-    "/static",
-    StaticFiles(directory="static"),
-    name="static",
-)
-
-
-# @app.on_event("startup")
-# async def startup():
-#     await engine.connect()
-#
-#
-# @app.on_event("shutdown")
-# async def shutdown():
-#     await engine.disconnect()
+# app.mount(
+#     "/static",
+#     StaticFiles(directory="static"),
+#     name="static",
+# )

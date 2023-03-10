@@ -28,7 +28,7 @@ admin = Admin(
     index_view=DashboardView(
         name='Home',
         url='/'
-    )
+    ),
 )
 
 admin.add_view(UserModelView(User, db_sync, name='Пользователи'))

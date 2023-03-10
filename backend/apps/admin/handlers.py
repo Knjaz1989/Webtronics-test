@@ -1,13 +1,13 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask.views import MethodView
-from flask_login import login_required, login_user
+from flask_login import login_user
 
 from database.models import User
 
 
 class Login(MethodView):
     def get(self):
-        return render_template("templates/login.html")
+        return render_template("login.html")
 
     def post(self):
         user: User = User.check_user(
