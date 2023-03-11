@@ -31,3 +31,7 @@ then create admin
 ```bash
 ./manager.py admin create-admin
 ```
+run tests
+```bash
+pytest tests
+```
