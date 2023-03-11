@@ -1,4 +1,4 @@
-# webtronics-test
+# FastAPI-posts
 Welcom to the user posts API. 
 First you need to sign up and then you can log in. 
 You can create, change and delete posts. 
